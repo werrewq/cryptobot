@@ -1,0 +1,24 @@
+from Bot.domain.BrokerApi import BrokerApi
+from Bot.domain.MessengerApi import MessengerApi
+from Bot.domain.TradeIntent import TradeIntent
+
+
+class CloseLongUseCase:
+    broker_api: BrokerApi
+    messenger_api: MessengerApi
+
+    def __init__(self, broker_api, messenger_api):
+        self.broker_api = broker_api
+        self.messenger_api = messenger_api
+
+    def run(self, trade_intent: TradeIntent):
+        try:
+            self.__bot_close_long(trade_intent)
+        except Exception as e:
+            print(repr(e))
+            self.messenger_api.send_message(message="Ошибка во время закрытия Лонга: " + repr(e))
+
+    def __bot_close_long(self, trade_intent: TradeIntent):
+        if self.broker_api.have_order_long(trade_intent.currency_name):
+            self.broker_api.close_long_position(trade_intent.currency_name)
+            self.messenger_api.send_message("#Закрываем Long ✅")
