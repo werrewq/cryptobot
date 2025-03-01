@@ -38,7 +38,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     broker_api: BrokerApi = providers.Singleton(
         BybitApi,
-
     )
 
     close_short_usecase = providers.Factory(

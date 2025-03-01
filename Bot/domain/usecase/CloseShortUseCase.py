@@ -19,6 +19,7 @@ class CloseShortUseCase:
             self.messenger_api.send_message(message="Ошибка во время закрытия Шорта: " + repr(e))
 
     def __bot_close_short(self, trade_intent: TradeIntent):
+        self.broker_api.cancel_all_active_orders()
         if self.broker_api.have_order_short(trade_intent.currency_name):
             self.broker_api.close_short_position(trade_intent.currency_name)
             self.messenger_api.send_message("#Закрываем SHORT ✅")

@@ -1,7 +1,6 @@
-import dataclasses
-from typing import Any, Coroutine
+import logging
 
-from flask import *
+from flask import Flask, request, jsonify
 
 from Bot.domain.MessengerApi import MessengerApi
 from Bot.domain.TradeInteractor import TradeInteractor
@@ -26,6 +25,12 @@ class SignalController:
         self.__interactor = interactor
         self.setup_handlers()
 
+        # # Настройка логирования
+        logging.basicConfig(
+            level=logging.DEBUG,  # Уровень логирования
+            format='%(asctime)s - %(levelname)s - %(message)s'  # Формат сообщений
+        )
+
     def run(self):
         print("Запускаем Flask")
         self.__flask.run()
@@ -37,6 +42,7 @@ class SignalController:
             print("Входящее оповещение")
             json_data = request.json
             print("Signal: " + str(json_data))
+            logging.debug("СИГНАЛ ОТ TRADING VIEW \n" + str(json_data))
             try:
                 self.__messenger.send_message("Signal: " + str(json_data))
                 intent = self.__mapper.map(json_data)

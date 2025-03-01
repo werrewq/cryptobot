@@ -2,7 +2,6 @@ from Bot.domain.MessengerApi import MessengerApi, TradingStatus
 from Bot.domain.TradeIntent import LongIntent, ShortIntent, TradeIntent
 from Bot.domain.usecase import OpenLongUseCase, OpenShortUseCase
 
-
 class TradeInteractor:
     __open_long_usecase: OpenLongUseCase
     __open_short_usecase: OpenShortUseCase

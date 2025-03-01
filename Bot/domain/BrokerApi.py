@@ -14,11 +14,11 @@ class BrokerApi:
         pass
 
     @abc.abstractmethod
-    def place_buy_order(self, long_intent: LongIntent):
+    def place_buy_order(self, long_intent: LongIntent) -> str:
         pass
 
     @abc.abstractmethod
-    def place_sell_order(self, short_intent: ShortIntent):
+    def place_sell_order(self, short_intent: ShortIntent) -> str:
         pass
 
     @abc.abstractmethod
@@ -27,4 +27,8 @@ class BrokerApi:
 
     @abc.abstractmethod
     def close_long_position(self, currency_name):
+        pass
+
+    @abc.abstractmethod
+    def cancel_all_active_orders(self):
         pass

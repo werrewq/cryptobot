@@ -8,11 +8,20 @@ class SignalToIntentMapper:
        close = float(signal["price"])
 # TODO Доделать заполнение LongIntent и ShortIntent
 # TODO Добавить обработку currency
-       currency_name = "ALGO"
+       currency_name = "BTC"
        match buy_or_sell:
            case "open_long":
                return LongIntent(currency_name= currency_name, message= "long")
            case "open_short":
                return ShortIntent(currency_name= currency_name, message= "short")
+           case "open_long_when":
+               # strategy.entry("Long", strategy.long, when=Timerange())
+               pass
+           case "open_short_when":
+               # strategy.entry("Short", strategy.short, when=Timerange())
+               pass
+           # strategy.entry("Long",true,when=entry_long)
+           # strategy.exit("TP/SL","Long", limit=long_take_level, stop=long_stop_level)
+           # strategy.close("Long", when=exit_long, comment="Exit")
            case _:
                raise TypeError('Unsupported trade intent')
