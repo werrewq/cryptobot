@@ -14,11 +14,7 @@ class OpenShortUseCase:
         self.close_long_usecase = close_long_usecase
 
     def run(self, short_intent: ShortIntent):
-        try:
-            self.__bot_open_short(short_intent)
-        except Exception as e:
-            print(repr(e))
-            self.messenger_api.send_message(message="Ошибка во время открытия Шорта: " + repr(e))
+        self.__bot_open_short(short_intent)
 
     def __bot_open_short(self, short_intent: ShortIntent):
         self.messenger_api.send_message(message="Пробуем открыть SHORT 📉")

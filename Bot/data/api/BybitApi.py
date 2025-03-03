@@ -42,34 +42,22 @@ class BybitApi(BrokerApi):
         """
         Получаю остатки на аккаунте по конкретной монете
         """
-        try:
-            r = self.__client.get_wallet_balance(accountType="UNIFIED", coin= coin_name)
-            print(str(r))
-            wallet_balance = None
-            result = r['result']
-            wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
-            coins = wallet['coin']
-            for coin in coins:
-                if coin['coin'] == coin_name:
-                    wallet_balance = coin['walletBalance']
-                    break
-            print(f"wallet_balance = {wallet_balance}")
-            if wallet_balance is not None:
-                return float(wallet_balance)
-            else:
-                return 0.0
 
-        except exceptions.InvalidRequestError as e:
-            print("ByBit API Request Error", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except exceptions.FailedRequestError as e:
-            print("HTTP Request Failed", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except Exception as e:
-            print(repr(e))
-            return 0
+        r = self.__client.get_wallet_balance(accountType="UNIFIED", coin= coin_name)
+        print(str(r))
+        wallet_balance = None
+        result = r['result']
+        wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
+        coins = wallet['coin']
+        for coin in coins:
+            if coin['coin'] == coin_name:
+                wallet_balance = coin['walletBalance']
+                break
+        print(f"wallet_balance = {wallet_balance}")
+        if wallet_balance is not None:
+            return float(wallet_balance)
+        else:
+            return 0.0
 
     def __get_coin_precision(self, pair_name, need_quote_precision) -> int:
         """
@@ -115,35 +103,22 @@ class BybitApi(BrokerApi):
         return self.__place_order(coin_name=short_intent.currency_name +"USDT", asset_name = short_intent.currency_name,side=side)
 
     def __place_order(self, coin_name, asset_name, side) -> str:
-        try:
-            # TODO доделать лимитки assets
-            available_assets = self.get_assets(asset_name)
-            # TODO доделать установку объема
-            available_assets = available_assets / 100
-            need_quote_precision = False
-            if side == "Buy":
-                need_quote_precision = True
-            min_precision = self.__get_coin_precision(coin_name, need_quote_precision)
-            order_value = float_trunc(available_assets, min_precision)
-            market_category = "spot"
-            return self.__api_place_order(
-                coin_name,
-                side,
-                market_category,
-                order_value,
-            )
-
-        except exceptions.InvalidRequestError as e:
-            print("ByBit API Request Error", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except exceptions.FailedRequestError as e:
-            print("HTTP Request Failed", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except Exception as e:
-            print(repr(e))
-            return repr(e)
+        # TODO доделать лимитки assets
+        available_assets = self.get_assets(asset_name)
+        # TODO доделать установку объема
+        available_assets = available_assets / 100
+        need_quote_precision = False
+        if side == "Buy":
+            need_quote_precision = True
+        min_precision = self.__get_coin_precision(coin_name, need_quote_precision)
+        order_value = float_trunc(available_assets, min_precision)
+        market_category = "spot"
+        return self.__api_place_order(
+            coin_name,
+            side,
+            market_category,
+            order_value,
+        )
 
     def __api_place_order(self, coin_name, side, market_category, order_value):
         # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")
@@ -154,6 +129,7 @@ class BybitApi(BrokerApi):
             symbol=coin_name, # USDT и Name меняются местами
             side=side,
             orderType="Market",
+            # qty=0.0000000000000000001
             qty=order_value,
             # marketUnit="quoteCoin",
         )
@@ -164,47 +140,31 @@ class BybitApi(BrokerApi):
         return str(r)
 
     def __place_limit_order(self, name, side, price):
-        try:
-            # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")
-            # print(r)
+        # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")
+        # print(r)
+        self.__client.get_instruments_info(category="spot", symbol="SOLUSDT")
+        available = self.get_assets(name)
+        print(available, round(available, 3), float_trunc(available, 3), float_trunc(available, 3))
 
-            self.__client.get_instruments_info(category="spot", symbol="SOLUSDT")
+        r = self.__client.place_order(
+            category="linear",
+            symbol=name + "USDT", # USDT и Name меняются местами
+            side=side,
+            orderType="Market",
+            qty=float_trunc(available, 3),
+            # marketUnit="quoteCoin", TODO торгует через USDT при SELL BTC
+        )
+        r = self.__client.place_order(
+            category="spot",
+            symbol=name + "USDT", # USDT и Name меняются местами
+            side=side,
+            orderType="Limit",
+            qty=float_trunc(available, 3),
+            price=round_down(price * 0.99, 2),
+        )
 
-            available = self.get_assets(name)
-            print(available, round(available, 3), float_trunc(available, 3), float_trunc(available, 3))
-
-            r = self.__client.place_order(
-                category="linear",
-                symbol=name + "USDT", # USDT и Name меняются местами
-                side=side,
-                orderType="Market",
-                qty=float_trunc(available, 3),
-                # marketUnit="quoteCoin", TODO торгует через USDT при SELL BTC
-            )
-            r = self.__client.place_order(
-                category="spot",
-                symbol=name + "USDT", # USDT и Name меняются местами
-                side=side,
-                orderType="Limit",
-                qty=float_trunc(available, 3),
-                price=round_down(price * 0.99, 2),
-            )
-
-            print(str(r))
-            return str(r)
-
-        except exceptions.InvalidRequestError as e:
-            print("ByBit API Request Error", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except exceptions.FailedRequestError as e:
-            print("HTTP Request Failed", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except Exception as e:
-            traceback.print_exc()
-            print(repr(e))
-            return repr(e)
+        print(str(r))
+        return str(r)
 
 
         #
@@ -231,30 +191,17 @@ class BybitApi(BrokerApi):
         return self.__have_order(currency_name, self.PositionType.SHORT, category_type = "linear")
 
     def __have_order(self, currency_name, position_type: PositionType, category_type):
-        try:
-            json = self.__client.get_positions(
-                category = category_type,
-                symbol = currency_name + "USDT"
-            )
-            print(str(json))
-            have_order = False
-            positions = json['result']
-            for position in positions['list']:
-                if position['side'] == position_type.value:
-                    have_order = True
-            return have_order
-        except exceptions.InvalidRequestError as e:
-            print("ByBit API Request Error", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except exceptions.FailedRequestError as e:
-            print("HTTP Request Failed", e.status_code, e.message, sep=" | ")
-            traceback.print_exc()
-            return e.message
-        except Exception as e:
-            print(repr(e))
-            traceback.print_exc()
-            return repr(e)
+        json = self.__client.get_positions(
+            category = category_type,
+            symbol = currency_name + "USDT"
+        )
+        print(str(json))
+        have_order = False
+        positions = json['result']
+        for position in positions['list']:
+            if position['side'] == position_type.value:
+                have_order = True
+        return have_order
 
     def __close_position(self, currency_name, side):
         pass

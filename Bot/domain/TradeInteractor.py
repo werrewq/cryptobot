@@ -17,7 +17,7 @@ class TradeInteractor:
         self.__open_short_usecase = open_short_usecase
         self.__messenger = messenger_api
 
-    async def start_trade(self, trade_intent: TradeIntent):
+    def start_trade(self, trade_intent: TradeIntent):
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.currency_name)
         trading_status = self.__messenger.get_bot_trading_status()
         if trading_status == TradingStatus.OFFLINE:
@@ -27,9 +27,9 @@ class TradeInteractor:
 
         match trade_intent:
             case LongIntent():
-                await self.__open_long_usecase.run(trade_intent)
+                self.__open_long_usecase.run(trade_intent)
 
             case ShortIntent():
-                await self.__open_short_usecase.run(trade_intent)
+                self.__open_short_usecase.run(trade_intent)
             case _:
                 raise TypeError('Unsupported type')

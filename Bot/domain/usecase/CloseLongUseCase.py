@@ -12,11 +12,7 @@ class CloseLongUseCase:
         self.messenger_api = messenger_api
 
     def run(self, trade_intent: TradeIntent):
-        try:
-            self.__bot_close_long(trade_intent)
-        except Exception as e:
-            print(repr(e))
-            self.messenger_api.send_message(message="Ошибка во время закрытия Лонга: " + repr(e))
+        self.__bot_close_long(trade_intent)
 
     def __bot_close_long(self, trade_intent: TradeIntent):
         self.broker_api.cancel_all_active_orders()
