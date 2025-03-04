@@ -31,7 +31,6 @@ class BybitApiOld(BrokerApi):
 
     def __init__(self):
         print("BybitApi init")
-        self.__init_api_logging()
         self.__connect_to_api()
 
     def __connect_to_api(self):
@@ -57,9 +56,6 @@ class BybitApiOld(BrokerApi):
             api_key=API_KEY,
             api_secret=SECRET_KEY
         )
-
-    def __init_api_logging(self):
-        logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
 
     def get_position(self, currency_name):
         return self._session_auth_perp.my_position(symbol=currency_name)

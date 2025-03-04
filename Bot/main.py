@@ -3,6 +3,7 @@ from dependency_injector.wiring import inject, Provide
 from Bot.di.ApplicationContainer import ApplicationContainer
 from Bot.domain.MessengerApi import MessengerApi
 from Bot.presentation.SignalController import SignalController
+from Bot.presentation.logger.BotLogger import BotLogger
 
 
 class CryptoBot:
@@ -25,6 +26,7 @@ class CryptoBot:
 
 # Точка входа в приложение
 if __name__ == '__main__':
+    BotLogger().run()
     container = ApplicationContainer()
     container.wire(modules=[__name__])
     CryptoBot().run()

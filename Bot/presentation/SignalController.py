@@ -30,12 +30,6 @@ class SignalController:
         self.__error_handler = error_handler
         self.setup_handlers()
 
-        # # Настройка логирования
-        logging.basicConfig(
-            level=logging.DEBUG,  # Уровень логирования
-            format='%(asctime)s - %(levelname)s - %(message)s'  # Формат сообщений
-        )
-
     def run(self):
         print("Запускаем Flask")
         self.__flask.run()
@@ -47,7 +41,7 @@ class SignalController:
             print("Входящее оповещение")
             json_data = request.json
             print("Signal: " + str(json_data))
-            logging.debug("СИГНАЛ ОТ TRADING VIEW \n" + str(json_data))
+            logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
             self.__error_handler.handle(lambda : process_signal(json_data))
             return jsonify({"status": "success"})

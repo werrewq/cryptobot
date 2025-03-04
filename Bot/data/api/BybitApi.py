@@ -23,11 +23,7 @@ class BybitApi(BrokerApi):
 
     def __init__(self):
         print("BybitApi init")
-        self.__init_api_logging()
         self.__connect_to_api()
-
-    def __init_api_logging(self):
-        logging.basicConfig(format="%(asctime)s %(message)s", level=logging.DEBUG)
 
     def __connect_to_api(self):
         print("try to connect to Api")
@@ -129,8 +125,8 @@ class BybitApi(BrokerApi):
             symbol=coin_name, # USDT и Name меняются местами
             side=side,
             orderType="Market",
-            # qty=0.0000000000000000001
-            qty=order_value,
+            qty=0.0000000000000000001
+            # qty=order_value,
             # marketUnit="quoteCoin",
         )
         logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n"+ str(r))
