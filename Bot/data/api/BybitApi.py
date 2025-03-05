@@ -13,6 +13,7 @@ from enum import Enum
 # Тестовые ключи
 API_KEY = "6pAf7l2HZn46GqJqu6"
 SECRET_KEY = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
+MARKET_CATEGORY = "linear"
 
 # API_KEY = os.getenv("BB_API_KEY")
 # SECRET_KEY = os.getenv("BB_SECRET_KEY")
@@ -50,7 +51,7 @@ class BybitApi(BrokerApi):
                 wallet_balance = coin['walletBalance']
                 break
         print(f"wallet_balance = {wallet_balance}")
-        if wallet_balance is not None:
+        if wallet_balance is not None and wallet_balance != "":
             return float(wallet_balance)
         else:
             return 0.0
@@ -108,7 +109,7 @@ class BybitApi(BrokerApi):
             need_quote_precision = True
         min_precision = self.__get_coin_precision(coin_name, need_quote_precision)
         order_value = float_trunc(available_assets, min_precision)
-        market_category = "spot"
+        market_category = MARKET_CATEGORY
         return self.__api_place_order(
             coin_name,
             side,
@@ -117,16 +118,15 @@ class BybitApi(BrokerApi):
         )
 
     def __api_place_order(self, coin_name, side, market_category, order_value):
-        # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")
-        # print(r)
         r = self.__client.place_order(
             # category="linear",
             category=market_category,
-            symbol=coin_name, # USDT и Name меняются местами
+            symbol=coin_name,
             side=side,
             orderType="Market",
-            qty=0.0000000000000000001
-            # qty=order_value,
+            time_in_force="GoodTillCancel",
+            #qty=0.0000000000000000001
+            qty=order_value,
             # marketUnit="quoteCoin",
         )
         logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n"+ str(r))
@@ -143,18 +143,20 @@ class BybitApi(BrokerApi):
         print(available, round(available, 3), float_trunc(available, 3), float_trunc(available, 3))
 
         r = self.__client.place_order(
-            category="linear",
+            category=MARKET_CATEGORY,
             symbol=name + "USDT", # USDT и Name меняются местами
             side=side,
             orderType="Market",
+            time_in_force="GoodTillCancel",
             qty=float_trunc(available, 3),
             # marketUnit="quoteCoin", TODO торгует через USDT при SELL BTC
         )
         r = self.__client.place_order(
-            category="spot",
+            category=MARKET_CATEGORY,
             symbol=name + "USDT", # USDT и Name меняются местами
             side=side,
             orderType="Limit",
+            time_in_force="GoodTillCancel",
             qty=float_trunc(available, 3),
             price=round_down(price * 0.99, 2),
         )
@@ -181,11 +183,12 @@ class BybitApi(BrokerApi):
         SHORT = "Sell"
 
     def have_order_long(self, currency_name) -> bool:
-        return self.__have_order(currency_name, self.PositionType.LONG,category_type = "inverse")
+        return self.__have_order(currency_name, self.PositionType.LONG,category_type = MARKET_CATEGORY)
 
     def have_order_short(self, currency_name) -> bool:
-        return self.__have_order(currency_name, self.PositionType.SHORT, category_type = "linear")
+        return self.__have_order(currency_name, self.PositionType.SHORT, category_type = MARKET_CATEGORY)
 
+# TODO https://bybit-exchange.github.io/docs/v5/order/execution нужно проверить наличие лонгов/шортов, а не открытых ордеров
     def __have_order(self, currency_name, position_type: PositionType, category_type):
         json = self.__client.get_positions(
             category = category_type,
@@ -199,45 +202,50 @@ class BybitApi(BrokerApi):
                 have_order = True
         return have_order
 
-    def __close_position(self, currency_name, side):
-        pass
-        # try:
-        #     # Закрытие позиции
-        #     # response = self.__client.(
-        #     #     symbol=currency_name + "USDT",
-        #     #     side=side
-        #     # )
-        #     # print("Ответ от API:", response)
-        # except Exception as e:
-        #     print("Ошибка:", e)
-
-    # api.close_position(name_coin_u, "Buy", 1)
     def close_short_position(self, currency_name):
         side = "Buy"
-        self.__close_position(currency_name, side, self.PositionType.SHORT.value)
+        asset_name = "USDT"
+        self.__close_position(currency_name + "USDT", side, asset_name=asset_name)
 
-    # api.close_position(name_coin_u, "Sell", 0)
     def close_long_position(self, currency_name):
         side = "Sell"
-        self.__close_position(currency_name, side, self.PositionType.LONG.value)
+        asset_name = currency_name
+        self.__close_position(currency_name + "USDT", side, asset_name=asset_name)
 
-    def __close_position(self, name, side, long_0_short_1):
-        return (self._session_auth_perp.place_active_order(
-            symbol=name + "USDT",
+    def __close_position(self, pair_name, side,  asset_name):
+        # TODO доделать лимитки assets
+        available_assets = self.get_assets(asset_name) # TODO маркет может меняться
+        # TODO доделать установку объема
+        need_quote_precision = False
+        if side == "Buy":
+            need_quote_precision = True
+        min_precision = self.__get_coin_precision(pair_name, need_quote_precision)
+        order_value = float_trunc(available_assets, min_precision)
+
+        market_category = MARKET_CATEGORY # Не работает для SPOT
+        r = self.__client.place_order(
+            # category="linear",
+            category=market_category,
+            symbol=pair_name,
             side=side,
-            order_type="Market",
-            qty=self.__get_position_qty(name + "USDT", long_0_short_1),
+            orderType="Market",
             time_in_force="GoodTillCancel",
-            reduce_only=True,
-            close_on_trigger=False
-        ))
+            # qty=0.0000000000000000001
+            qty=order_value,
+            reduce_only=True
+            # marketUnit="quoteCoin",
+        )
+        logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n" + str(r))
+        # TODO убрать
+        order_history = self.__client.get_order_history(category=market_category)
+        logging.debug("CПИСОК ОРДЕРОВ \n" + str(order_history))
+        return str(r)
 
-    def __get_position_qty(self, name, long_0_short_1):
-        return self.get_position(name)["result"][long_0_short_1]["size"]
+
 
     def cancel_all_active_orders(self):
         self.__client.cancel_all_orders(
-            category = "spot"
+            category = MARKET_CATEGORY
         )
 
 def float_trunc(f, prec):
