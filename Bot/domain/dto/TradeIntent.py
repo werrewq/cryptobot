@@ -1,14 +1,15 @@
 from dataclasses import dataclass
 
+from Bot.domain.dto import TradingConfig
+
 @dataclass
 class TradeIntent:
-    currency_name: str
-
+    trading_config: TradingConfig
 
 @dataclass
 class LongIntent(TradeIntent):
-    message: str
+    pass
 
 @dataclass
 class ShortIntent(TradeIntent):
-    message: str
+    pass

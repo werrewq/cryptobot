@@ -1,6 +1,6 @@
 from Bot.domain.BrokerApi import BrokerApi
 from Bot.domain.MessengerApi import MessengerApi
-from Bot.domain.TradeIntent import TradeIntent
+from Bot.domain.dto.TradeIntent import TradeIntent
 
 
 class CloseLongUseCase:
@@ -15,7 +15,7 @@ class CloseLongUseCase:
         self.__bot_close_long(trade_intent)
 
     def __bot_close_long(self, trade_intent: TradeIntent):
-        self.broker_api.cancel_all_active_orders()
-        if self.broker_api.have_order_long(trade_intent.currency_name):
-            self.broker_api.close_long_position(trade_intent.currency_name)
+        self.broker_api.cancel_all_active_orders(trading_config=trade_intent.trading_config)
+        if self.broker_api.have_order_long(trade_intent.trading_config):
+            self.broker_api.close_long_position(trade_intent.trading_config)
             self.messenger_api.send_message("#Закрываем Long ✅")

@@ -1,14 +1,10 @@
-import traceback
-from zoneinfo import available_timezones
-
-from unicodedata import category
-
 from Bot.domain.BrokerApi import BrokerApi
-from Bot.domain.TradeIntent import ShortIntent, LongIntent
-from pybit import exceptions
+from Bot.domain.dto.TradeIntent import ShortIntent, LongIntent
 from pybit.unified_trading import HTTP
 import logging
 from enum import Enum
+
+from Bot.domain.dto.TradingConfig import TradingConfig
 
 # Тестовые ключи
 API_KEY = "6pAf7l2HZn46GqJqu6"
@@ -17,22 +13,21 @@ MARKET_CATEGORY = "linear"
 
 # API_KEY = os.getenv("BB_API_KEY")
 # SECRET_KEY = os.getenv("BB_SECRET_KEY")
-# TODO нужна вменяемая обработка ошибок
 class BybitApi(BrokerApi):
 
     __client: HTTP
 
-    def __init__(self):
+    def __init__(self, trading_config: TradingConfig):
         print("BybitApi init")
-        self.__connect_to_api()
+        self.__connect_to_api(trading_config)
 
-    def __connect_to_api(self):
+    def __connect_to_api(self, trading_config: TradingConfig):
         print("try to connect to Api")
         self.__client = HTTP(
             api_key=API_KEY,
             api_secret=SECRET_KEY,
             recv_window=60000,
-            testnet=True,
+            testnet=trading_config.testnet,
         )
 
     def get_assets(self, coin_name) -> float:
@@ -92,18 +87,35 @@ class BybitApi(BrokerApi):
 
     def place_buy_order(self, long_intent: LongIntent):
         side = "Buy"
-        return self.__place_order(coin_name=long_intent.currency_name + "USDT", asset_name = "USDT",side=side)
+        pair_name = long_intent.trading_config.target_coin_name + long_intent.trading_config.asset_name
+        return self.__place_order(
+            coin_name=pair_name,
+            asset_name = long_intent.trading_config.asset_name,
+            side=side,
+            trading_config=long_intent.trading_config,
+        )
 
     # api.place_order(name_coin_u, "Sell", 10)
     def place_sell_order(self, short_intent: ShortIntent):
         side = "Sell"
-        return self.__place_order(coin_name=short_intent.currency_name +"USDT", asset_name = short_intent.currency_name,side=side)
+        pair_name = short_intent.trading_config.target_coin_name + short_intent.trading_config.asset_name
+        return self.__place_order(
+            coin_name=pair_name,
+            asset_name = short_intent.trading_config.target_coin_name,
+            side=side,
+            trading_config=short_intent.trading_config,
+        )
 
-    def __place_order(self, coin_name, asset_name, side) -> str:
+    def __place_order(
+            self,
+            coin_name,
+            asset_name,
+            side,
+            trading_config: TradingConfig
+    ) -> str:
         # TODO доделать лимитки assets
-        available_assets = self.get_assets(asset_name)
-        # TODO доделать установку объема
-        available_assets = available_assets / 100
+        available_assets = self.get_assets(asset_name) # TODO поднять на уровень бизнесса, нужно понять на сколько это общая тема для разных API бирж
+        available_assets = available_assets / 100 * trading_config.order_volume_percent_of_capital
         need_quote_precision = False
         if side == "Buy":
             need_quote_precision = True
@@ -118,8 +130,8 @@ class BybitApi(BrokerApi):
         )
 
     def __api_place_order(self, coin_name, side, market_category, order_value):
+        # TODO ошибка для linear pybit.exceptions.InvalidRequestError: Qty invalid (ErrCode: 10001) (ErrTime: 13:01:25). не верное количество
         r = self.__client.place_order(
-            # category="linear",
             category=market_category,
             symbol=coin_name,
             side=side,
@@ -182,11 +194,11 @@ class BybitApi(BrokerApi):
         LONG = "Buy"
         SHORT = "Sell"
 
-    def have_order_long(self, currency_name) -> bool:
-        return self.__have_order(currency_name, self.PositionType.LONG,category_type = MARKET_CATEGORY)
+    def have_order_long(self, trading_config: TradingConfig) -> bool:
+        return self.__have_order(trading_config.target_coin_name, self.PositionType.LONG,category_type = MARKET_CATEGORY)
 
-    def have_order_short(self, currency_name) -> bool:
-        return self.__have_order(currency_name, self.PositionType.SHORT, category_type = MARKET_CATEGORY)
+    def have_order_short(self, trading_config: TradingConfig) -> bool:
+        return self.__have_order(trading_config.target_coin_name, self.PositionType.SHORT, category_type = MARKET_CATEGORY)
 
 # TODO https://bybit-exchange.github.io/docs/v5/order/execution нужно проверить наличие лонгов/шортов, а не открытых ордеров
     def __have_order(self, currency_name, position_type: PositionType, category_type):
@@ -202,15 +214,15 @@ class BybitApi(BrokerApi):
                 have_order = True
         return have_order
 
-    def close_short_position(self, currency_name):
+    def close_short_position(self, trading_config: TradingConfig):
         side = "Buy"
-        asset_name = "USDT"
-        self.__close_position(currency_name + "USDT", side, asset_name=asset_name)
+        pair_name = trading_config.target_coin_name + trading_config.asset_name
+        self.__close_position(pair_name, side, asset_name=trading_config.asset_name)
 
-    def close_long_position(self, currency_name):
+    def close_long_position(self, trading_config: TradingConfig):
         side = "Sell"
-        asset_name = currency_name
-        self.__close_position(currency_name + "USDT", side, asset_name=asset_name)
+        pair_name = trading_config.target_coin_name + trading_config.asset_name
+        self.__close_position(pair_name, side, trading_config.asset_name)
 
     def __close_position(self, pair_name, side,  asset_name):
         # TODO доделать лимитки assets
@@ -243,9 +255,11 @@ class BybitApi(BrokerApi):
 
 
 
-    def cancel_all_active_orders(self):
+    def cancel_all_active_orders(self, trading_config: TradingConfig):
+        symbol = trading_config.target_coin_name + trading_config.asset_name
         self.__client.cancel_all_orders(
-            category = MARKET_CATEGORY
+            category = MARKET_CATEGORY,
+            symbol = symbol
         )
 
 def float_trunc(f, prec):

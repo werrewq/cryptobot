@@ -1,5 +1,5 @@
 from Bot.domain.MessengerApi import MessengerApi, TradingStatus
-from Bot.domain.TradeIntent import LongIntent, ShortIntent, TradeIntent
+from Bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent
 from Bot.domain.usecase import OpenLongUseCase, OpenShortUseCase
 
 class TradeInteractor:
@@ -18,11 +18,11 @@ class TradeInteractor:
         self.__messenger = messenger_api
 
     def start_trade(self, trade_intent: TradeIntent):
-        self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.currency_name)
+        self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
         trading_status = self.__messenger.get_bot_trading_status()
         if trading_status == TradingStatus.OFFLINE:
             print("TradingStatus.OFFLINE")
-            self.__messenger.send_message("Бот не торгует, статус OFFLINE " + trade_intent.currency_name)
+            self.__messenger.send_message("Бот не торгует, статус OFFLINE " + trade_intent.trading_config.target_coin_name)
             return
 
         match trade_intent:

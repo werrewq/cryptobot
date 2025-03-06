@@ -20,14 +20,14 @@ class BybitErrorHandler(ErrorHandler):
                         + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
                         + repr(e)
                         + "\n"
-                        + str(traceback.extract_stack)
+                        + str(traceback.format_exc())
             )
             self.messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
                         + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
                         + repr(e)
                         + "\n"
-                        + str(traceback.extract_stack)
+                        + str(traceback.format_exc())
             )
         except exceptions.FailedRequestError as e:
             logging.error(
@@ -35,25 +35,25 @@ class BybitErrorHandler(ErrorHandler):
                         + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
                         + repr(e)
                         + "\n"
-                        + str(traceback.extract_stack)
+                        + str(traceback.format_exc())
             )
             self.messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
                         + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
                         + repr(e)
                         + "\n"
-                        + str(traceback.extract_stack)
+                        + str(traceback.format_exc())
             )
         except Exception as e:
             logging.error(
                 msg="Ошибка на боте: \n"
                     + repr(e)
                     + "\n"
-                    + str(traceback.extract_stack)
+                    + str(traceback.format_exc())
             )
             self.messenger.send_message(
                 message="Ошибка на боте: \n"
                     + repr(e)
                     + "\n"
-                    + str(traceback.extract_stack)
+                    + str(traceback.format_exc())
             )

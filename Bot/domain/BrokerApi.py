@@ -1,16 +1,17 @@
 import abc
 
-from Bot.domain.TradeIntent import LongIntent, ShortIntent
+from Bot.domain.dto.TradeIntent import LongIntent, ShortIntent
+from Bot.domain.dto.TradingConfig import TradingConfig
 
 
 class BrokerApi:
 
     @abc.abstractmethod
-    def have_order_long(self, currency_name) -> bool:
+    def have_order_long(self, trading_config: TradingConfig) -> bool:
         pass
 
     @abc.abstractmethod
-    def have_order_short(self, currency_name) -> bool:
+    def have_order_short(self, trading_config: TradingConfig) -> bool:
         pass
 
     @abc.abstractmethod
@@ -22,13 +23,13 @@ class BrokerApi:
         pass
 
     @abc.abstractmethod
-    def close_short_position(self, currency_name):
+    def close_short_position(self, trading_config: TradingConfig):
         pass
 
     @abc.abstractmethod
-    def close_long_position(self, currency_name):
+    def close_long_position(self, trading_config: TradingConfig):
         pass
 
     @abc.abstractmethod
-    def cancel_all_active_orders(self):
+    def cancel_all_active_orders(self, trading_config: TradingConfig):
         pass

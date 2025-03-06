@@ -1,11 +1,13 @@
 from dependency_injector import containers, providers
 
+from Bot.config.TradingConfigProvider import TradingConfigProvider
 from Bot.data.api.BybitApi import BybitApi
 from Bot.data.api.BybitErrorHandler import BybitErrorHandler
 from Bot.domain.BrokerApi import BrokerApi
 from Bot.domain.ErrorHandler import ErrorHandler
 from Bot.domain.MessengerApi import MessengerApi
 from Bot.domain.TradeInteractor import TradeInteractor
+from Bot.domain.dto.TradingConfig import TradingConfig
 from Bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from Bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
 from Bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
@@ -29,17 +31,20 @@ class ApplicationContainer(containers.DeclarativeContainer):
     #     Service,
     #     api_client=api_client,
     # )
+    trading_config: TradingConfig = TradingConfigProvider().provide()
 
     messenger_api: MessengerApi = providers.Singleton(
         TelegramApi,
     )
 
     signal_to_intent_mapper = providers.Factory(
-        SignalToIntentMapper
+        SignalToIntentMapper,
+        trading_config = trading_config,
     )
 
     broker_api: BrokerApi = providers.Singleton(
         BybitApi,
+        trading_config = trading_config,
     )
 
     close_short_usecase = providers.Factory(

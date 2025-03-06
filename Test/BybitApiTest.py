@@ -1,30 +1,31 @@
+from Bot.config.TradingConfigProvider import TradingConfigProvider
 from Bot.data.api.BybitApi import BybitApi
-from Bot.domain.TradeIntent import ShortIntent, LongIntent
+from Bot.domain.dto.TradeIntent import ShortIntent, LongIntent
+from Bot.domain.dto.TradingConfig import TradingConfig
 
-api = BybitApi()
-currency_name="SOL"
+trading_config: TradingConfig = TradingConfigProvider().provide()
+api = BybitApi(trading_config)
 
 def place_sell_order():
     intent = ShortIntent(
-        currency_name=currency_name,
-        message="sell"
+        trading_config= trading_config
     )
     api.place_sell_order(intent)
 
 def have_long_order():
-    print(api.have_order_long(currency_name))
+    print(api.have_order_long(trading_config))
 
 def have_short_order():
-    print(api.have_order_short(currency_name))
+    print(api.have_order_short(trading_config))
 
 def close_long_position():
-    api.close_long_position(currency_name)
+    api.close_long_position(trading_config)
 
 def get_assets():
-    api.get_assets(currency_name)
+    api.get_assets(trading_config.asset_name)
 
 def place_buy_order():
-    intent = LongIntent(currency_name= currency_name, message= "long")
+    intent = LongIntent(trading_config)
     api.place_buy_order(intent)
 
 if __name__ == '__main__':

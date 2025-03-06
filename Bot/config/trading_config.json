@@ -1,0 +1,6 @@
+{
+  "order_volume_percent_of_capital": 20,
+  "target_coin_name": "SOL",
+  "asset_name": "USDT",
+  "testnet": true
+}
