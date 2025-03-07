@@ -1,6 +1,6 @@
-from Bot.domain import MessengerApi
-from Bot.domain.BrokerApi import BrokerApi
-from Bot.domain.dto.TradeIntent import TradeIntent
+from bot.domain import MessengerApi
+from bot.domain.BrokerApi import BrokerApi
+from bot.domain.dto.TradeIntent import TradeIntent
 
 
 class CloseShortUseCase:

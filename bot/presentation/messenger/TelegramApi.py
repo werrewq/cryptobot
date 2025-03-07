@@ -4,7 +4,7 @@ from typing import Optional
 import telebot
 from telebot import types
 
-from Bot.domain.MessengerApi import MessengerApi, TradingStatus
+from bot.domain.MessengerApi import MessengerApi, TradingStatus
 
 #t.me/SergeySignalBot
 # @SergeySignalBot

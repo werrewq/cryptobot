@@ -1,11 +1,11 @@
 import json
 import os
 
-from Bot.domain.dto.TradingConfig import TradingConfig
+from bot.domain.dto.TradingConfig import TradingConfig
 
 
 class TradingConfigProvider:
-    __trading_config_json_file_path = os.path.join('..', 'Bot', 'config', 'trading_config.json')
+    __trading_config_json_file_path = os.path.join(os.path.dirname(__file__), 'trading_config.json')
 
     def provide(self) -> TradingConfig:
         trading_config_json = None

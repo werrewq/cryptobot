@@ -1,12 +1,11 @@
-import asyncio
 import logging
 
 from flask import Flask, request, jsonify
 
-from Bot.domain.ErrorHandler import ErrorHandler
-from Bot.domain.MessengerApi import MessengerApi
-from Bot.domain.TradeInteractor import TradeInteractor
-from Bot.presentation.SignalToIntentMapper import SignalToIntentMapper
+from bot.domain.ErrorHandler import ErrorHandler
+from bot.domain.MessengerApi import MessengerApi
+from bot.domain.TradeInteractor import TradeInteractor
+from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 
 # app = Flask(__name__)
 
@@ -32,7 +31,7 @@ class SignalController:
 
     def run(self):
         print("Запускаем Flask")
-        self.__flask.run()
+        self.__flask.run(host='0.0.0.0', port=5000, debug=True)
         #self.__flask.run(host='0.0.0.0', port=8080, debug=True)
 
     def setup_handlers(self):

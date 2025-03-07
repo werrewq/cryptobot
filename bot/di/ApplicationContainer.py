@@ -1,36 +1,24 @@
 from dependency_injector import containers, providers
 
-from Bot.config.TradingConfigProvider import TradingConfigProvider
-from Bot.data.api.BybitApi import BybitApi
-from Bot.data.api.BybitErrorHandler import BybitErrorHandler
-from Bot.domain.BrokerApi import BrokerApi
-from Bot.domain.ErrorHandler import ErrorHandler
-from Bot.domain.MessengerApi import MessengerApi
-from Bot.domain.TradeInteractor import TradeInteractor
-from Bot.domain.dto.TradingConfig import TradingConfig
-from Bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
-from Bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
-from Bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
-from Bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
-from Bot.presentation.SignalController import SignalController
-from Bot.presentation.SignalToIntentMapper import SignalToIntentMapper
-from Bot.presentation.messenger.TelegramApi import TelegramApi
+from bot.config.TradingConfigProvider import TradingConfigProvider
+from bot.data.api.BybitApi import BybitApi
+from bot.data.api.BybitErrorHandler import BybitErrorHandler
+from bot.domain.BrokerApi import BrokerApi
+from bot.domain.ErrorHandler import ErrorHandler
+from bot.domain.MessengerApi import MessengerApi
+from bot.domain.TradeInteractor import TradeInteractor
+from bot.domain.dto.TradingConfig import TradingConfig
+from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
+from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
+from bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
+from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
+from bot.presentation.SignalController import SignalController
+from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
+from bot.presentation.messenger.TelegramApi import TelegramApi
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
 
-    # config = providers.Configuration()
-    #
-    # api_client = providers.Singleton(
-    #     ApiClient,
-    #     api_key=config.api_key,
-    #     timeout=config.timeout,
-    # )
-    #
-    # service = providers.Factory(
-    #     Service,
-    #     api_client=api_client,
-    # )
     trading_config: TradingConfig = TradingConfigProvider().provide()
 
     messenger_api: MessengerApi = providers.Singleton(

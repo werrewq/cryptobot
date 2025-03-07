@@ -3,7 +3,7 @@ import traceback
 
 from pybit import exceptions
 
-from Bot.domain.ErrorHandler import ErrorHandler
+from bot.domain.ErrorHandler import ErrorHandler
 
 
 class BybitErrorHandler(ErrorHandler):

@@ -1,10 +1,10 @@
-from Bot.domain.BrokerApi import BrokerApi
-from Bot.domain.dto.TradeIntent import ShortIntent, LongIntent
+from bot.domain.BrokerApi import BrokerApi
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
 from pybit.unified_trading import HTTP
 import logging
 from enum import Enum
 
-from Bot.domain.dto.TradingConfig import TradingConfig
+from bot.domain.dto.TradingConfig import TradingConfig
 
 # Тестовые ключи
 API_KEY = "6pAf7l2HZn46GqJqu6"

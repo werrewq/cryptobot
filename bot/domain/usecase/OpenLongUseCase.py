@@ -1,7 +1,7 @@
-from Bot.domain.BrokerApi import BrokerApi
-from Bot.domain.MessengerApi import MessengerApi
-from Bot.domain.dto.TradeIntent import LongIntent
-from Bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
+from bot.domain.BrokerApi import BrokerApi
+from bot.domain.MessengerApi import MessengerApi
+from bot.domain.dto.TradeIntent import LongIntent
+from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
 
 
 class OpenLongUseCase:

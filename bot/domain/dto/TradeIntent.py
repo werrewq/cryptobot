@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Bot.domain.dto import TradingConfig
+from bot.domain.dto import TradingConfig
 
 @dataclass
 class TradeIntent:

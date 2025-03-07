@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 
-from Bot.domain.MessengerApi import MessengerApi
+from bot.domain.MessengerApi import MessengerApi
 
 
 class ErrorHandler(ABC):

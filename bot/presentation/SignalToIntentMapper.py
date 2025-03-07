@@ -1,5 +1,5 @@
-from Bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent
-from Bot.domain.dto.TradingConfig import TradingConfig
+from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent
+from bot.domain.dto.TradingConfig import TradingConfig
 
 
 class SignalToIntentMapper:

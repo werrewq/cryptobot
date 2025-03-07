@@ -1,7 +1,7 @@
-from Bot.config.TradingConfigProvider import TradingConfigProvider
-from Bot.data.api.BybitApi import BybitApi
-from Bot.domain.dto.TradeIntent import ShortIntent, LongIntent
-from Bot.domain.dto.TradingConfig import TradingConfig
+from bot.config.TradingConfigProvider import TradingConfigProvider
+from bot.data.api.BybitApi import BybitApi
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
+from bot.domain.dto.TradingConfig import TradingConfig
 
 trading_config: TradingConfig = TradingConfigProvider().provide()
 api = BybitApi(trading_config)
