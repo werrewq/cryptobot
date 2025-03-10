@@ -1,6 +1,6 @@
 import requests
 
-url = 'http://localhost:5000/position'
+url = 'http://localhost:8080/position'
 
 
 def open_short():
