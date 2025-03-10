@@ -9,6 +9,6 @@ RUN pip3 install --upgrade pip -r requirements.txt
 # в рабочую директорию контейнера
 COPY . /app/bot
 # Устанавливаем порт, который будет использоваться для сервера
-EXPOSE 8080
+EXPOSE 8000
 # Устанавливаем PYTHONPATH
 ENV PYTHONPATH="${PYTHONPATH}:/app"
