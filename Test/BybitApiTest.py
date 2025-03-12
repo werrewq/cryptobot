@@ -21,6 +21,9 @@ def have_short_order():
 def close_long_position():
     api.close_long_position(trading_config)
 
+def close_short_position():
+    api.close_short_position(trading_config)
+
 def get_assets():
     api.get_assets(trading_config.asset_name)
 
@@ -28,7 +31,10 @@ def place_buy_order():
     intent = LongIntent(trading_config)
     api.place_buy_order(intent)
 
+def get_filters():
+    api.get_filters(trading_config)
+
 if __name__ == '__main__':
-    close_long_position()
+    close_short_position()
 
 

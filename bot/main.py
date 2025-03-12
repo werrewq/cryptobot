@@ -24,13 +24,16 @@ class CryptoBot:
         self.__messenger_api.run()
         self.__signal_controller.run()
 
-# Точка входа в приложение
-if __name__ == '__main__':
-    # while True:
-    #     print("DONE")
+def main():
     BotLogger().run()
     container = ApplicationContainer()
     container.wire(modules=[__name__])
     CryptoBot().run()
+
+# Точка входа в приложение
+if __name__ == '__main__':
+    print("MAIN RUN")
+    main()
+
 
 
