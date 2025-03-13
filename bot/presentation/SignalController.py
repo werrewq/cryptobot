@@ -7,8 +7,6 @@ from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 
-# app = Flask(__name__)
-
 class SignalController:
     __mapper: SignalToIntentMapper
     __messenger: MessengerApi
@@ -31,7 +29,7 @@ class SignalController:
 
     def run(self):
         print("Запускаем Flask")
-        self.__flask.run(host='0.0.0.0', port=5000, debug=True)
+        self.__flask.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
         #self.__flask.run(host='0.0.0.0', port=8080, debug=True)
 
     def setup_handlers(self):
