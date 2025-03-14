@@ -2,3 +2,4 @@ Flask[async]==3.1.0
 pyTelegramBotAPI==4.26.0
 pybit==5.9.0
 dependency-injector==4.45.0
+gunicorn==23.0.0
