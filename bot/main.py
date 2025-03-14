@@ -22,13 +22,15 @@ class CryptoBot:
 
     def run(self):
         self.__messenger_api.run()
-        self.__signal_controller.run()
+        flask_app = self.__signal_controller.run()
+        return flask_app
 
 def main():
     BotLogger().run()
     container = ApplicationContainer()
     container.wire(modules=[__name__])
-    CryptoBot().run()
+    flask_app = CryptoBot().run()
+    return flask_app
 
 # Точка входа в приложение
 if __name__ == '__main__':

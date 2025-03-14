@@ -29,7 +29,8 @@ class SignalController:
 
     def run(self):
         print("Запускаем Flask")
-        self.__flask.run(host='0.0.0.0', port=5001)
+        return self.__flask
+        # self.__flask.run(host='0.0.0.0', port=5001)
         #self.__flask.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
 
     def setup_handlers(self):

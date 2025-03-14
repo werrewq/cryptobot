@@ -1,6 +1,6 @@
 import requests
 
-url = 'http://localhost:5000/position'
+url = 'http://localhost:8000/position'
 #url = 'http://werrewq-cryptobot-719a.twc1.net:8000/position'
 
 
