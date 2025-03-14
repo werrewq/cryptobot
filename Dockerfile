@@ -1,14 +1,11 @@
 # Выкачиваем из dockerhub образ с python версии 3.9
-FROM python:3.10-bookworm
-# Устанавливаем рабочую директорию для проекта в контейнере
-WORKDIR /app
-# Скачиваем/обновляем необходимые библиотеки для проекта
-COPY /bot/requirements.txt /app
-RUN pip3 install --upgrade pip -r requirements.txt
-# |ВАЖНЫЙ МОМЕНТ| копируем содержимое папки, где находится Dockerfile,
-# в рабочую директорию контейнера
-COPY /bot /app/bot
+FROM python:3.10-slim
+# копируем файлы проекта
+COPY . .
+# обновляем окружени
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential
+# устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
 # Устанавливаем порт, который будет использоваться для сервера
 EXPOSE 8000
-# Устанавливаем PYTHONPATH
-ENV PYTHONPATH="${PYTHONPATH}:/app"
+CMD gunicorn bot.main:"main()" -b 0.0.0.0:8000 --reload
