@@ -4,7 +4,8 @@ import os
 
 class BotLogger:
     # D:\dev\bot\CryptoBot\cryptobot\Bot\logs
-    __log_file_path = os.path.join(os.path.dirname(__file__),'..','..', 'logs', 'debug_log.log')
+    # __log_file_path = os.path.join(os.path.dirname(__file__),'..','..', 'logs', 'debug_log.log')
+    __log_file_path = os.path.join(os.path.dirname(__file__), 'debug_log.log')
 
     def run(self):
 
