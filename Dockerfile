@@ -8,4 +8,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 RUN pip install --no-cache-dir -r requirements.txt
 # Устанавливаем порт, который будет использоваться для сервера
 EXPOSE 8000
-CMD gunicorn bot.main:"main()" -b 0.0.0.0:8000 --reload
+# CMD gunicorn bot.main:"main()" -b 0.0.0.0:8000 --reload
+CMD ["gunicorn", "bot.main:main", "-b", "0.0.0.0:8000", "--reload"]
