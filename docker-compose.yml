@@ -22,4 +22,4 @@ services:
     # Порт, который будет смотреть наружу : порт который используется внутри контейнера
     ports:
       - "5000:5000"
-    command: python3 /app/bot/main.py
+    command: gunicorn bot.main:"main()" -b 0.0.0.0:5000 --reload
