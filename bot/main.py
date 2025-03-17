@@ -27,19 +27,26 @@ class CryptoBot:
         flask_app = self.__signal_controller.run()
         return flask_app
 
-def main(environ, start_response):
+def start_bot_locally():
     BotLogger().run()
-    logging.debug("environ \n" + str(environ))
-    logging.debug("start_response \n" + str(start_response))
+    # logging.debug("environ \n" + str(environ))
+    # logging.debug("start_response \n" + str(start_response))
     container = ApplicationContainer()
     container.wire(modules=[__name__])
     flask_app = CryptoBot().run()
     return flask_app
 
-# Точка входа в приложение
+def start_bot():
+    BotLogger().run()
+    container = ApplicationContainer()
+    container.wire(modules=[__name__])
+    flask_app = CryptoBot().run()
+    return flask_app
+
+# # Точка входа в приложение
 # if __name__ == '__main__':
 #     print("MAIN RUN")
-#     main()
+#     start_bot_locally()
 
 
 

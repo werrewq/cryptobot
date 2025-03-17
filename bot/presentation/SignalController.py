@@ -36,9 +36,7 @@ class SignalController:
     def setup_handlers(self):
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
-            print("Входящее оповещение")
             json_data = request.json
-            print("Signal: " + str(json_data))
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
             self.__error_handler.handle(lambda : process_signal(json_data))
