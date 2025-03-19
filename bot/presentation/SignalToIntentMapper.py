@@ -10,7 +10,6 @@ class SignalToIntentMapper:
 
     def map(self, signal) -> TradeIntent:
         buy_or_sell = str(signal["signal"])
-        close = float(signal["price"])
         # TODO Доделать заполнение LongIntent и ShortIntent
         # TODO Добавить обработку currency
         currency_name = "BTC"
@@ -19,12 +18,6 @@ class SignalToIntentMapper:
                 return LongIntent(trading_config=self.__trading_config)
             case "open_short":
                 return ShortIntent(trading_config=self.__trading_config)
-            case "open_long_when":
-                # strategy.entry("Long", strategy.long, when=Timerange())
-                pass
-            case "open_short_when":
-                # strategy.entry("Short", strategy.short, when=Timerange())
-                pass
             # strategy.entry("Long",true,when=entry_long)
             # strategy.exit("TP/SL","Long", limit=long_take_level, stop=long_stop_level)
             # strategy.close("Long", when=exit_long, comment="Exit")

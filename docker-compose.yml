@@ -4,5 +4,5 @@ services:
     build: .
     container_name: bot-flask
     ports:
-      - "8000:8000"
+      - "80:8000"
 

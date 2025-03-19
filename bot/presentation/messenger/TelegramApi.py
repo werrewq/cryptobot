@@ -48,7 +48,7 @@ class TelegramApi(MessengerApi):
         # Обработчик текстовых сообщений
         @self.bot.message_handler(func=lambda message: True)
         def handle_message(message):
-            logging.debug("Telebot handle message" + message.text)
+            logging.debug("Telebot handle message " + message.text)
             if message.text == "Торговать":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот начинает торговать.")
                 self.__trading_status = TradingStatus.ONLINE

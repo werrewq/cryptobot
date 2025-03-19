@@ -7,6 +7,8 @@ from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 
+TOKEN = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+
 class SignalController:
     __mapper: SignalToIntentMapper
     __messenger: MessengerApi
@@ -37,6 +39,9 @@ class SignalController:
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
             json_data = request.json
+            if not self.check_token(json_data):
+                logging.debug("WRONG TOKEN")
+                return
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
             self.__error_handler.handle(lambda : process_signal(json_data))
@@ -45,5 +50,25 @@ class SignalController:
         def process_signal(json_data):
             intent = self.__mapper.map(json_data)
             self.__interactor.start_trade(intent)
+
+    def check_token(self, json_data):
+        try:
+            message_token = json_data["token"]
+            if message_token == TOKEN:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logging.error(
+                msg="Ошибка обработки токена: \n"
+                    + repr(e)
+                    + "\n"
+            )
+            self.__messenger.send_message(
+                message="Ошибка обработки токена: \n"
+                    + repr(e)
+                    + "\n"
+            )
+            return False
 
 
