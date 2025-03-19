@@ -39,6 +39,7 @@ class SignalController:
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
             json_data = request.json
+            logging.debug("Signal from TRADING VIEW \n" + str(request))
             if not self.check_token(json_data):
                 logging.debug("WRONG TOKEN")
                 return
