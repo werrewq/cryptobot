@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 #url = 'http://localhost:8000/position'
@@ -13,10 +15,10 @@ headers = {
 
 def open_short():
     print("--------SHORT TEST--------")
-    data = {
+    data = json.dumps({
         "signal": "open_short",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
-    }
+    })
     response = requests.post(url, json=data, headers= headers)
     print("Response: " + response.text)
     print("Response status code:", response.status_code)
@@ -24,10 +26,10 @@ def open_short():
 
 def open_long():
     print("--------LONG TEST--------")
-    data = {
+    data = json.dumps({
         "signal": "open_long",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
-    }
+    })
     response = requests.post(url, json=data, headers= headers)
     print("Response: " + response.text)
     print("Response status code:", response.status_code)
