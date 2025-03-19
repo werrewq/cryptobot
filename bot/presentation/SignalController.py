@@ -47,8 +47,8 @@ class SignalController:
             self.__error_handler.handle(lambda : process_signal(json_data))
             return 200
 
-        @self.__flask.route(methods=['GET'])
-        async def trading_signals():
+        @self.__flask.route("/")
+        async def base_signal():
             logging.debug("Test Get 200")
             return 200
 
