@@ -45,12 +45,12 @@ class SignalController:
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
             self.__error_handler.handle(lambda : process_signal(json_data))
-            return 200
+            return "200"
 
         @self.__flask.route("/")
         async def base_signal():
             logging.debug("Test Get 200")
-            return 200
+            return "200"
 
         def process_signal(json_data):
             intent = self.__mapper.map(json_data)
