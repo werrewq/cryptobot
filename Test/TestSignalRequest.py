@@ -2,9 +2,9 @@ import json
 
 import requests
 
-#url = 'http://localhost:8000/position'
-#url = 'http://77.232.135.88/position'
-url = 'http://werrewq-cryptobot-719a.twc1.net/position'
+#url = 'https://localhost:8000/position'
+#url = 'https://77.232.135.88/position'
+url = 'https://werrewq-cryptobot-719a.twc1.net/position'
 
 #"{"signal":"{{strategy.order.comment}}","token":"2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}"
 

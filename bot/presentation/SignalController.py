@@ -42,7 +42,7 @@ class SignalController:
             logging.debug("Signal from TRADING VIEW \n" + str(request))
             if not self.check_token(json_data):
                 logging.debug("WRONG TOKEN")
-                return
+                return "401 Unauthorized"
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
             self.__error_handler.handle(lambda : process_signal(json_data))
@@ -59,7 +59,7 @@ class SignalController:
 
     def check_token(self, json_data):
         try:
-            message_token = json_data["token"]
+            message_token = str(json_data["token"])
             if message_token == TOKEN:
                 return True
             else:
