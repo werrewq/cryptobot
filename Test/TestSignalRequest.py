@@ -1,7 +1,7 @@
 import requests
 
-url = 'http://localhost:8000/position'
-#url = 'http://77.232.135.88:8000/position'
+#url = 'http://localhost:8000/position'
+url = 'http://77.232.135.88/position'
 
 #"{"signal":"{{strategy.order.comment}}","token":"2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}"
 
