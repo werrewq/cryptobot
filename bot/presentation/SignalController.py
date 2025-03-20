@@ -41,12 +41,12 @@ class SignalController:
         async def trading_signals():
             json_data = request.json
             logging.debug("Signal from TRADING VIEW \n" + str(request))
-            if not self.check_token(json_data):
+            if not self.check_token(str(json_data)):
                 logging.debug("WRONG TOKEN")
                 return "401 Unauthorized"
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
-            self.__error_handler.handle(lambda : process_signal(json_data))
+            self.__error_handler.handle(lambda : process_signal(str(json_data)))
             return "200"
 
         @self.__flask.route("/")
