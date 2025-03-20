@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Dict, Any
 
 from flask import Flask, request, jsonify
 
@@ -39,14 +40,14 @@ class SignalController:
     def setup_handlers(self):
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
-            json_data = request.json
+            json_data = self.get_dict_from_request(request.json)
             logging.debug("Signal from TRADING VIEW \n" + str(request))
-            if not self.check_token(str(json_data)):
+            if not self.check_token(json_data):
                 logging.debug("WRONG TOKEN")
                 return "401 Unauthorized"
             logging.debug("Signal from TRADING VIEW \n" + str(json_data))
             self.__messenger.send_message("Signal: " + str(json_data))
-            self.__error_handler.handle(lambda : process_signal(str(json_data)))
+            self.__error_handler.handle(lambda : process_signal(json_data))
             return "200"
 
         @self.__flask.route("/")
@@ -58,11 +59,23 @@ class SignalController:
             intent = self.__mapper.map(json_data)
             self.__interactor.start_trade(intent)
 
+    def get_dict_from_request(self, json_data) -> Dict[str, Any]:
+        # Проверяем, является ли json_data строкой
+        if isinstance(json_data, bytes):
+            json_data = json_data.decode('utf-8')  # Декодируем байты в строку
+        elif isinstance(json_data, str):
+            json_data = json.loads(json_data)  # Преобразуем строку в словарь
+        elif isinstance(json_data, Dict):
+            pass
+        else:
+            raise TypeError("Signal JSON has wrong typing")
+        return json_data
+
+
     def check_token(self, json_data):
         try:
-            data = json.loads(json_data)
-            logging.debug(str(data))
-            message_token = str(data["token"])
+            logging.debug(str(json_data))
+            message_token = str(json_data["token"])
             logging.debug(str(message_token))
             if message_token == TOKEN:
                 return True

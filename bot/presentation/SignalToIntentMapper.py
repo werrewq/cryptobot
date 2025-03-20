@@ -10,8 +10,7 @@ class SignalToIntentMapper:
     def __init__(self, trading_config: TradingConfig):
         self.__trading_config = trading_config
 
-    def map(self, signal) -> TradeIntent:
-        data = json.loads(signal)
+    def map(self, data) -> TradeIntent:
         buy_or_sell = str(data["signal"])
         match buy_or_sell:
             case "open_long":
