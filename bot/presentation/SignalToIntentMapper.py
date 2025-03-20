@@ -1,3 +1,5 @@
+import json
+
 from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
@@ -9,10 +11,8 @@ class SignalToIntentMapper:
         self.__trading_config = trading_config
 
     def map(self, signal) -> TradeIntent:
-        buy_or_sell = str(signal["signal"])
-        # TODO Доделать заполнение LongIntent и ShortIntent
-        # TODO Добавить обработку currency
-        currency_name = "BTC"
+        data = json.loads(signal)
+        buy_or_sell = str(data["signal"])
         match buy_or_sell:
             case "open_long":
                 return LongIntent(trading_config=self.__trading_config)
