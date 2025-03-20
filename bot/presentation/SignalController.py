@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Flask, request, jsonify
@@ -59,8 +60,9 @@ class SignalController:
 
     def check_token(self, json_data):
         try:
-            logging.debug(str(json_data))
-            message_token = str(json_data["token"])
+            data = json.loads(json_data)
+            logging.debug(str(data))
+            message_token = str(data["token"])
             logging.debug(str(message_token))
             if message_token == TOKEN:
                 return True
