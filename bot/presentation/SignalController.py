@@ -59,7 +59,9 @@ class SignalController:
 
     def check_token(self, json_data):
         try:
+            logging.debug(str(json_data))
             message_token = str(json_data["token"])
+            logging.debug(str(message_token))
             if message_token == TOKEN:
                 return True
             else:
