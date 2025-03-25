@@ -33,20 +33,20 @@ class SignalController:
 
     def run(self):
         print("Запускаем Flask")
+        self.__flask.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False) # TODO убрать
         return self.__flask
         # self.__flask.run(host='0.0.0.0', port=5001)
-        #self.__flask.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
+
 
     def setup_handlers(self):
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
             json_data = self.get_dict_from_request(request.json)
-            logging.debug("Signal from TRADING VIEW \n" + str(request))
             if not self.check_token(json_data):
                 logging.debug("WRONG TOKEN")
                 return "401 Unauthorized"
-            logging.debug("Signal from TRADING VIEW \n" + str(json_data))
-            self.__messenger.send_message("Signal: " + str(json_data))
+            logging.debug("Signal from TRADING VIEW \n" + str(json_data["signal"]))
+            self.__messenger.send_message("Signal from TRADING VIEW \n" + str(json_data["signal"]))
             self.__error_handler.handle(lambda : process_signal(json_data))
             return "200"
 

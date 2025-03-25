@@ -20,7 +20,7 @@ class OpenShortUseCase:
         self.messenger_api.send_message(message="Пробуем открыть SHORT 📉")
         self.close_long_usecase.run(short_intent)
         message = self.broker_api.place_sell_order(short_intent)
-        self.messenger_api.send_message(message="Разместили заказ на покупку: " + message)
+        self.messenger_api.send_message(message="Разместили заказ на продажу\n: " + message)
 
     #
     # async def bot_open_short(message, api, close):

@@ -1,7 +1,6 @@
-import decimal
 from decimal import Decimal
 
-from bot.data.api.ApiHelpers import count_decimal_places, PositionType, float_trunc, round_down, floor_qty
+from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty
 from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
@@ -26,6 +25,8 @@ class BybitApi(BrokerApi):
         print("BybitApi init")
         self.__connect_to_api(trading_config)
         self.__coin_pair_info = self.get_filters(trading_config)
+        self.__set_leverage(trading_config)
+
 
     def __connect_to_api(self, trading_config: TradingConfig):
         print("try to connect to Api")
@@ -59,7 +60,8 @@ class BybitApi(BrokerApi):
         """
         Один из способов получения текущей цены
         """
-        r = float(self.__client.get_tickers(category=MARKET_CATEGORY, symbol=pair).get('result').get('list')[0].get('ask1Price'))
+        tickers = self.__client.get_tickers(category=MARKET_CATEGORY, symbol=pair)
+        r = float(tickers.get('result').get('list')[0].get('ask1Price'))
         return r
 
     def get_assets(self, coin_name) -> float:
@@ -116,19 +118,22 @@ class BybitApi(BrokerApi):
         (для спота есть аргумент marketUnit, см. https://youtu.be/e7Np2ICYBzg )
         """
         available_assets = self.get_assets(asset_name) # TODO поднять на уровень бизнесса, нужно понять на сколько это общая тема для разных API бирж
+        curr_price = self.get_price(trading_config.target_coin_name + trading_config.asset_name)
         if asset_name == trading_config.target_coin_name: # продаем целевую валюту, для linear ордер считаем в ней
             assets_for_order = available_assets
             qty = assets_for_order
         else:  # если обмениваем USDT на что-то, то мы указываем количество целевой валюты к покупке, т.е. Nпокупка = Nusdt / CoinPrice
             assets_for_order = available_assets / 100 * trading_config.order_volume_percent_of_capital # cчитаем на сколько будем торговать
-            curr_price = self.get_price(trading_config.target_coin_name + trading_config.asset_name)
             qty = floor_qty(assets_for_order / curr_price, self.__coin_pair_info)  # переводим USDT в целевую валюту
         if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
+
+        order_message = f'''Совершена сделка:\nТип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
 
         return self.__api_place_order(
             coin_name,
             side,
             qty,
+            order_message,
         )
 
     # def place_market_order_by_base(self, qty : float = 0.00001, side : str = "Sell"):
@@ -151,7 +156,13 @@ class BybitApi(BrokerApi):
     #     self.log("result", r)
     #   return r
 
-    def __api_place_order(self, coin_name, side, order_value):
+    def __api_place_order(
+            self,
+            coin_name,
+            side,
+            order_value,
+            order_message,
+    ):
         # TODO ошибка для linear pybit.exceptions.InvalidRequestError: Qty invalid (ErrCode: 10001) (ErrTime: 13:01:25). не верное количество
         r = self.__client.place_order(
             category=MARKET_CATEGORY,
@@ -162,8 +173,9 @@ class BybitApi(BrokerApi):
             #qty=0.0000000000000000001
             qty=order_value,
         )
+
         logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n"+ str(r))
-        return str(r)
+        return order_message
 
     def __place_limit_order(self, name, side, price):
         # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")
@@ -247,4 +259,15 @@ class BybitApi(BrokerApi):
             category = MARKET_CATEGORY,
             symbol = symbol
         )
+
+    def __set_leverage(self, trading_config: TradingConfig):
+        if trading_config.leverage <= 1:
+            return
+        r = self.__client.set_leverage(
+            category=MARKET_CATEGORY,
+            symbol=trading_config.target_coin_name + trading_config.asset_name,
+            buyLeverage=str(trading_config.leverage),
+            sellLeverage=str(trading_config.leverage),
+        )
+        logging.debug(f"Set leverage: {str(r)}")
 

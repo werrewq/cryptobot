@@ -20,5 +20,6 @@ class TradingConfigProvider:
                 order_volume_percent_of_capital = trading_config_json['order_volume_percent_of_capital'],
                 target_coin_name = trading_config_json['target_coin_name'],
                 asset_name = trading_config_json['asset_name'],
+                leverage = trading_config_json['leverage'],
                 testnet = trading_config_json['testnet'],
             )

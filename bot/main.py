@@ -44,9 +44,9 @@ def start_bot():
     return flask_app
 
 # # Точка входа в приложение
-# if __name__ == '__main__':
-#     print("MAIN RUN")
-#     start_bot_locally()
+if __name__ == '__main__':
+    print("MAIN RUN")
+    start_bot_locally()
 
 
 

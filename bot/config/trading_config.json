@@ -1,6 +1,7 @@
 {
-  "order_volume_percent_of_capital": 20,
-  "target_coin_name": "SOL",
+  "order_volume_percent_of_capital": 100,
+  "target_coin_name": "DOGE",
   "asset_name": "USDT",
+  "leverage": 2,
   "testnet": true
 }
