@@ -9,6 +9,7 @@ from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from pybit.unified_trading import HTTP
 import logging
 from bot.domain.dto.TradingConfig import TradingConfig
+from bot.presentation.logger.TradingLogger import TradingLogger, RawTradingLog
 
 # Тестовые ключи
 API_KEY = "6pAf7l2HZn46GqJqu6"
@@ -21,13 +22,14 @@ class BybitApi(BrokerApi):
 
     __client: HTTP
     __coin_pair_info: CoinPairInfo
+    __trading_logger: TradingLogger
 
-    def __init__(self, trading_config: TradingConfig):
+    def __init__(self, trading_config: TradingConfig, trading_logger: TradingLogger):
         print("BybitApi init")
         self.__connect_to_api(trading_config)
         self.__coin_pair_info = self.get_filters(trading_config)
         self.__set_leverage(trading_config)
-
+        self.__trading_logger = trading_logger
 
     def __connect_to_api(self, trading_config: TradingConfig):
         print("try to connect to Api")
@@ -130,12 +132,23 @@ class BybitApi(BrokerApi):
 
         order_message = f'''Совершена сделка:\nТип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
 
-        return self.__api_place_order(
+        result = self.__api_place_order(
             coin_name,
             side,
             qty,
             order_message,
         )
+        log = RawTradingLog(
+            coin_name=coin_name,
+            side=side,
+            leverage=str(trading_config.leverage),
+            coin_price=str(curr_price),
+            qty=qty,
+            asset_name=asset_name,
+            available_assets=str(available_assets),
+        )
+        self.__trading_logger.trade_log(log)
+        return result
 
     # def place_market_order_by_base(self, qty : float = 0.00001, side : str = "Sell"):
     #     """

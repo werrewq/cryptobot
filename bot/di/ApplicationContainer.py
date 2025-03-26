@@ -15,12 +15,17 @@ from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
 from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
+from bot.presentation.logger.TradingLogger import TradingLogger
 from bot.presentation.messenger.TelegramApi import TelegramApi
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
 
     trading_config: TradingConfig = TradingConfigProvider().provide()
+
+    trading_logger: TradingLogger = providers.Singleton(
+        TradingLogger
+    )
 
     messenger_api: MessengerApi = providers.Singleton(
         TelegramApi,
@@ -34,6 +39,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
     broker_api: BrokerApi = providers.Singleton(
         BybitApi,
         trading_config = trading_config,
+        trading_logger = trading_logger,
     )
 
     close_short_usecase = providers.Factory(
