@@ -5,6 +5,7 @@ from bot.domain.dto import TradingConfig
 @dataclass
 class TradeIntent:
     trading_config: TradingConfig
+    side: str
 
 @dataclass
 class LongIntent(TradeIntent):
@@ -13,3 +14,7 @@ class LongIntent(TradeIntent):
 @dataclass
 class ShortIntent(TradeIntent):
     pass
+
+@dataclass
+class StopLossIntent(TradeIntent):
+    trigger_price: float

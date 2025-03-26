@@ -1,21 +1,25 @@
 from bot.domain.MessengerApi import MessengerApi, TradingStatus
-from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent
-from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase
+from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent
+from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase
+
 
 class TradeInteractor:
     __open_long_usecase: OpenLongUseCase
     __open_short_usecase: OpenShortUseCase
     __messenger: MessengerApi
+    __set_stop_loss_usecase: SetStopLossUseCase
 
     def __init__(
             self,
             open_long_usecase,
             open_short_usecase,
+            set_stop_loss_usecase,
             messenger_api: MessengerApi,
     ):
         self.__open_long_usecase = open_long_usecase
         self.__open_short_usecase = open_short_usecase
         self.__messenger = messenger_api
+        self.__set_stop_loss_usecase = set_stop_loss_usecase
 
     def start_trade(self, trade_intent: TradeIntent):
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
@@ -31,5 +35,9 @@ class TradeInteractor:
 
             case ShortIntent():
                 self.__open_short_usecase.run(trade_intent)
+
+            case StopLossIntent():
+                self.__set_stop_loss_usecase.run(trade_intent)
+
             case _:
                 raise TypeError('Unsupported type')

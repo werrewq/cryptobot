@@ -12,6 +12,7 @@ from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
 from bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
 from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
+from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.messenger.TelegramApi import TelegramApi
@@ -61,10 +62,17 @@ class ApplicationContainer(containers.DeclarativeContainer):
         close_long_usecase = close_long_usecase
     )
 
+    set_stop_loss_usecase = providers.Factory(
+        SetStopLossUseCase,
+        broker_api = broker_api,
+        messenger_api = messenger_api
+    )
+
     trade_interactor: TradeInteractor = providers.Factory(
         TradeInteractor,
         open_long_usecase = open_long_usecase,
         open_short_usecase = open_short_usecase,
+        set_stop_loss_usecase = set_stop_loss_usecase,
         messenger_api = messenger_api,
     )
 

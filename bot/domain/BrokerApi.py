@@ -1,6 +1,6 @@
 import abc
 
-from bot.domain.dto.TradeIntent import LongIntent, ShortIntent
+from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, StopLossIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 
@@ -32,4 +32,8 @@ class BrokerApi:
 
     @abc.abstractmethod
     def cancel_all_active_orders(self, trading_config: TradingConfig):
+        pass
+
+    @abc.abstractmethod
+    def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
         pass

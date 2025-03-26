@@ -1,12 +1,13 @@
 from decimal import Decimal
 
-from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty
+from pybit import exceptions
+
+from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty, floor_price
 from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.domain.BrokerApi import BrokerApi
-from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from pybit.unified_trading import HTTP
 import logging
-
 from bot.domain.dto.TradingConfig import TradingConfig
 
 # Тестовые ключи
@@ -263,11 +264,43 @@ class BybitApi(BrokerApi):
     def __set_leverage(self, trading_config: TradingConfig):
         if trading_config.leverage <= 1:
             return
-        r = self.__client.set_leverage(
+        try:
+            r = self.__client.set_leverage(
+                category=MARKET_CATEGORY,
+                symbol=trading_config.target_coin_name + trading_config.asset_name,
+                buyLeverage=str(trading_config.leverage),
+                sellLeverage=str(trading_config.leverage),
+            )
+            logging.debug(f"Set leverage: {str(r)}")
+        except exceptions.InvalidRequestError as e:
+            if e.status_code == 110043:
+                logging.debug(f"Leverage {trading_config.leverage} was already set ")
+            else:
+                logging.error(f"InvalidRequestError set_leverage Error {e.message}")
+
+
+
+
+    def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
+        config: TradingConfig = stop_loss_intent.trading_config
+        pair_name = config.target_coin_name + config.asset_name
+        trigger_price = stop_loss_intent.trigger_price
+        curr_price = self.get_price(pair_name)
+        trigger_direction = 1 if trigger_price > curr_price else 2
+
+        r = self.__client.place_order(
             category=MARKET_CATEGORY,
-            symbol=trading_config.target_coin_name + trading_config.asset_name,
-            buyLeverage=str(trading_config.leverage),
-            sellLeverage=str(trading_config.leverage),
+            symbol=pair_name,
+            side=stop_loss_intent.side,
+            orderType="Market",
+            time_in_force="GoodTillCancel",
+            qty=0.0,
+            reduceOnly=True,
+            closeOnTrigger=True,
+            triggerPrice=floor_price(trigger_price, self.__coin_pair_info),
+            triggerDirection=trigger_direction,
         )
-        logging.debug(f"Set leverage: {str(r)}")
+        logging.debug(f"Set Stop Loss: {str(r)}")
+        message = f'''Установлен STOP LOSS:\nТип сделки: Market\nВалюта: {pair_name}\nНаправление: {stop_loss_intent.side}\nУровень активации: {trigger_price} USDT\n'''
+        return message
 

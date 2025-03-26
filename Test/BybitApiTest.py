@@ -8,7 +8,8 @@ api = BybitApi(trading_config)
 
 def place_sell_order():
     intent = ShortIntent(
-        trading_config= trading_config
+        trading_config= trading_config,
+        side="sell"
     )
     api.place_sell_order(intent)
 
@@ -28,7 +29,7 @@ def get_assets():
     api.get_assets(trading_config.asset_name)
 
 def place_buy_order():
-    intent = LongIntent(trading_config)
+    intent = LongIntent(trading_config, side="buy")
     api.place_buy_order(intent)
 
 def get_filters():
