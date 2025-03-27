@@ -3,6 +3,8 @@ services:
   bot-flask:
     build: .
     container_name: bot-flask
+    env_file:
+      - .env
     ports:
       - "8000:80"
 
