@@ -30,7 +30,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         trading_config
     )
 
-    logger: BotLogger = providers.Singleton(
+    logger = providers.Singleton(
         BotLogger
     )
 

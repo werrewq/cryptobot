@@ -29,15 +29,15 @@ class CryptoBot:
 
 def start_bot_locally():
     container = ApplicationContainer()
-    container.logger.run()
     container.wire(modules=[__name__])
+    container.logger().run()
     flask_app = CryptoBot().run()
     flask_app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
 
 def start_bot():
     container = ApplicationContainer()
-    container.logger.run()
     container.wire(modules=[__name__])
+    container.logger().run()
     flask_app = CryptoBot().run()
     return flask_app
 
