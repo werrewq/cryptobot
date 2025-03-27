@@ -45,12 +45,11 @@ def start_bot_locally():
     flask_app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
 
 def start_bot():
-    logging.error("BOT STARTED")
-    # container = ApplicationContainer()
-    # container.wire(modules=[__name__])
-    # container.logger().run()
-    # flask_app = CryptoBot().run()
-    # return flask_app
+    container = ApplicationContainer()
+    container.wire(modules=[__name__])
+    container.logger().run()
+    flask_app = CryptoBot().run()
+    return flask_app
 
 # Точка входа в приложение
 # if __name__ == '__main__':
