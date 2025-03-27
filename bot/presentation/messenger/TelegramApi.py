@@ -17,8 +17,7 @@ class TelegramApi(MessengerApi):
     __chat_id: Optional[int]
 
     def __init__(self, secured_config: SecuredConfig):
-        self.__trading_status = TradingStatus.ONLINE
-        # TODO включить заглушку self.__trading_status = TradingStatus.OFFLINE
+        self.__trading_status = TradingStatus.OFFLINE
         self.bot = telebot.TeleBot(secured_config.get_telegram_bot_api_token())
         self.setup_handlers()
         self.__chat_id = None

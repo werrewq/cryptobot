@@ -29,8 +29,6 @@ class CryptoBot:
 
 def start_bot_locally():
     BotLogger().run()
-    # logging.debug("environ \n" + str(environ))
-    # logging.debug("start_response \n" + str(start_response))
     container = ApplicationContainer()
     container.wire(modules=[__name__])
     flask_app = CryptoBot().run()
@@ -43,10 +41,10 @@ def start_bot():
     flask_app = CryptoBot().run()
     return flask_app
 
-# # Точка входа в приложение
-if __name__ == '__main__':
-    print("MAIN RUN")
-    start_bot_locally()
+# # # Точка входа в приложение
+# if __name__ == '__main__':
+#     print("MAIN RUN")
+#     start_bot_locally()
 
 
 

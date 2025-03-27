@@ -173,7 +173,6 @@ class BybitApi(BrokerApi):
             order_value,
             order_message,
     ):
-        # TODO ошибка для linear pybit.exceptions.InvalidRequestError: Qty invalid (ErrCode: 10001) (ErrTime: 13:01:25). не верное количество
         r = self.__client.place_order(
             category=MARKET_CATEGORY,
             symbol=coin_name,
@@ -221,7 +220,6 @@ class BybitApi(BrokerApi):
     def have_order_short(self, trading_config: TradingConfig) -> bool:
         return self.__have_order(trading_config, PositionType.SHORT)
 
-# TODO https://bybit-exchange.github.io/docs/v5/order/execution нужно проверить наличие лонгов/шортов, а не открытых ордеров
     def __have_order(self, trading_config: TradingConfig, position_type: PositionType):
         json = self.__client.get_positions(
             category = MARKET_CATEGORY,
