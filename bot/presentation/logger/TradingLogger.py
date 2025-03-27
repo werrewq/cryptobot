@@ -56,3 +56,6 @@ class TradingLogger:
             "available_assets": raw_trading_log.available_assets,
         })
         self.__logger.info(msg= data)
+
+    def get_logs_path(self):
+        return self.__log_file_path

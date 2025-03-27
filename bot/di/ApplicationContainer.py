@@ -15,6 +15,7 @@ from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
 from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
+from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
 from bot.presentation.messenger.TelegramApi import TelegramApi
 
@@ -22,6 +23,10 @@ from bot.presentation.messenger.TelegramApi import TelegramApi
 class ApplicationContainer(containers.DeclarativeContainer):
 
     trading_config: TradingConfig = TradingConfigProvider().provide()
+
+    logger: BotLogger = providers.Singleton(
+        BotLogger
+    )
 
     trading_logger: TradingLogger = providers.Singleton(
         TradingLogger
@@ -93,4 +98,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
         messenger = messenger_api,
         interactor = trade_interactor,
         error_handler = error_handler,
+        logger = logger,
+        trade_logger = trading_logger
     )

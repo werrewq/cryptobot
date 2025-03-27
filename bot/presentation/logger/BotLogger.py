@@ -42,4 +42,5 @@ class BotLogger:
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
-
+    def get_logs_path(self):
+        return self.__log_file_path

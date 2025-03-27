@@ -37,8 +37,8 @@ def start_bot_locally():
     return flask_app
 
 def start_bot():
-    BotLogger().run()
     container = ApplicationContainer()
+    container.logger.run()
     container.wire(modules=[__name__])
     flask_app = CryptoBot().run()
     return flask_app
