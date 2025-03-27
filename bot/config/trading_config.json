@@ -4,5 +4,5 @@
   "asset_name": "USDT",
   "leverage": 2,
   "testnet": true,
-  "test_env_vars": false
+  "test_env_vars": true
 }
