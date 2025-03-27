@@ -1,5 +1,4 @@
 import logging
-import os
 
 from dependency_injector.wiring import Provide, inject
 
@@ -24,16 +23,7 @@ class CryptoBot:
         pass
 
     def run(self):
-        try:
-            var = os.environ["TELEGRAM_BOT_API_TOKEN"]
-            logging.debug(str(var))
-            self.__messenger_api.run()
-        except Exception as e:
-            logging.error(
-                msg="Ошибка __messenger_api: \n"
-                    + repr(e)
-                    + "\n"
-            )
+        self.__messenger_api.run()
         flask_app = self.__signal_controller.run()
         return flask_app
 
