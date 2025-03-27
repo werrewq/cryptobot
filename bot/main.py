@@ -41,10 +41,10 @@ def start_bot():
     flask_app = CryptoBot().run()
     return flask_app
 
-# # # Точка входа в приложение
-if __name__ == '__main__':
-    print("MAIN RUN")
-    start_bot_locally()
+# Точка входа в приложение
+# if __name__ == '__main__':
+#     print("MAIN RUN")
+#     start_bot_locally()
 
 
 
