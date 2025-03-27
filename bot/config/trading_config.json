@@ -3,5 +3,6 @@
   "target_coin_name": "DOGE",
   "asset_name": "USDT",
   "leverage": 2,
-  "testnet": true
+  "testnet": true,
+  "test_env_vars": true
 }

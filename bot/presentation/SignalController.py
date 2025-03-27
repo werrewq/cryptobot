@@ -4,14 +4,13 @@ from typing import Dict, Any
 
 from flask import Flask, request, jsonify, send_file
 
+from bot.config.SecuredConfig import SecuredConfig
 from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
-
-TOKEN = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
 
 class SignalController:
     __mapper: SignalToIntentMapper
@@ -21,6 +20,7 @@ class SignalController:
     __error_handler: ErrorHandler
     __logger: BotLogger
     __trade_logger: TradingLogger
+    __secured_config: SecuredConfig
 
     def __init__(
             self,
@@ -30,6 +30,7 @@ class SignalController:
             error_handler: ErrorHandler,
             logger: BotLogger,
             trade_logger: TradingLogger,
+            secured_config: SecuredConfig
     ):
         self.__mapper = mapper
         self.__messenger = messenger
@@ -38,6 +39,7 @@ class SignalController:
         self.setup_handlers()
         self.__logger = logger
         self.__trade_logger = trade_logger
+        self.__secured_config = secured_config
 
     def run(self):
         print("Запускаем Flask")
@@ -105,7 +107,7 @@ class SignalController:
             logging.debug(str(json_data))
             message_token = str(json_data["token"])
             logging.debug(str(message_token))
-            if message_token == TOKEN:
+            if message_token == self.__secured_config.get_cryptobot_api_token():
                 return True
             else:
                 return False

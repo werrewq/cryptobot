@@ -5,21 +5,21 @@ from typing import Optional
 import telebot
 from telebot import types
 
+from bot.config.SecuredConfig import SecuredConfig
 from bot.domain.MessengerApi import MessengerApi, TradingStatus
 
 #t.me/SergeySignalBot
 # @SergeySignalBot
-TELEGRAM_BOT_API_TOKEN = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk" # убрать в конфиг
 
 class TelegramApi(MessengerApi):
     __trading_status: TradingStatus
     bot: telebot.TeleBot
     __chat_id: Optional[int]
 
-    def __init__(self):
+    def __init__(self, secured_config: SecuredConfig):
         self.__trading_status = TradingStatus.ONLINE
         # TODO включить заглушку self.__trading_status = TradingStatus.OFFLINE
-        self.bot = telebot.TeleBot(TELEGRAM_BOT_API_TOKEN)
+        self.bot = telebot.TeleBot(secured_config.get_telegram_bot_api_token())
         self.setup_handlers()
         self.__chat_id = None
 

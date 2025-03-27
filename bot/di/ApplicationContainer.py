@@ -1,5 +1,6 @@
 from dependency_injector import containers, providers
 
+from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.data.api.BybitErrorHandler import BybitErrorHandler
@@ -24,6 +25,11 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     trading_config: TradingConfig = TradingConfigProvider().provide()
 
+    secured_config: SecuredConfig = providers.Singleton(
+        SecuredConfig,
+        trading_config
+    )
+
     logger: BotLogger = providers.Singleton(
         BotLogger
     )
@@ -34,6 +40,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     messenger_api: MessengerApi = providers.Singleton(
         TelegramApi,
+        secured_config = secured_config,
     )
 
     signal_to_intent_mapper = providers.Factory(
@@ -45,6 +52,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         BybitApi,
         trading_config = trading_config,
         trading_logger = trading_logger,
+        secured_config = secured_config,
     )
 
     close_short_usecase = providers.Factory(
@@ -99,5 +107,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
         interactor = trade_interactor,
         error_handler = error_handler,
         logger = logger,
-        trade_logger = trading_logger
+        trade_logger = trading_logger,
+        secured_config = secured_config
     )

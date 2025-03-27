@@ -2,9 +2,10 @@ from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
 from bot.domain.dto.TradingConfig import TradingConfig
+from bot.presentation.logger.TradingLogger import TradingLogger
 
 trading_config: TradingConfig = TradingConfigProvider().provide()
-api = BybitApi(trading_config)
+api = BybitApi(trading_config, TradingLogger())
 
 def place_sell_order():
     intent = ShortIntent(

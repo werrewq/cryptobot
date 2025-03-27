@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from pybit import exceptions
 
+from bot.config.SecuredConfig import SecuredConfig
 from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty, floor_price
 from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.domain.BrokerApi import BrokerApi
@@ -11,31 +12,26 @@ import logging
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.TradingLogger import TradingLogger, RawTradingLog
 
-# Тестовые ключи
-API_KEY = "6pAf7l2HZn46GqJqu6"
-SECRET_KEY = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
 MARKET_CATEGORY = "linear"
 
-# API_KEY = os.getenv("BB_API_KEY")
-# SECRET_KEY = os.getenv("BB_SECRET_KEY")
 class BybitApi(BrokerApi):
 
     __client: HTTP
     __coin_pair_info: CoinPairInfo
     __trading_logger: TradingLogger
 
-    def __init__(self, trading_config: TradingConfig, trading_logger: TradingLogger):
+    def __init__(self, trading_config: TradingConfig, trading_logger: TradingLogger,  secured_config: SecuredConfig):
         print("BybitApi init")
-        self.__connect_to_api(trading_config)
+        self.__connect_to_api(trading_config, secured_config)
         self.__coin_pair_info = self.get_filters(trading_config)
         self.__set_leverage(trading_config)
         self.__trading_logger = trading_logger
 
-    def __connect_to_api(self, trading_config: TradingConfig):
+    def __connect_to_api(self, trading_config: TradingConfig, secured_config: SecuredConfig):
         print("try to connect to Api")
         self.__client = HTTP(
-            api_key=API_KEY,
-            api_secret=SECRET_KEY,
+            api_key=secured_config.get_broker_api_key(),
+            api_secret=secured_config.get_broker_secret_key(),
             recv_window=60000,
             testnet=trading_config.testnet,
         )
