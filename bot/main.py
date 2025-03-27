@@ -28,11 +28,11 @@ class CryptoBot:
         return flask_app
 
 def start_bot_locally():
-    BotLogger().run()
     container = ApplicationContainer()
+    container.logger.run()
     container.wire(modules=[__name__])
     flask_app = CryptoBot().run()
-    return flask_app
+    flask_app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=False)
 
 def start_bot():
     container = ApplicationContainer()
@@ -42,9 +42,9 @@ def start_bot():
     return flask_app
 
 # # # Точка входа в приложение
-# if __name__ == '__main__':
-#     print("MAIN RUN")
-#     start_bot_locally()
+if __name__ == '__main__':
+    print("MAIN RUN")
+    start_bot_locally()
 
 
 
