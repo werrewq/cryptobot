@@ -1,11 +1,8 @@
-import logging
-
 from dependency_injector.wiring import Provide, inject
 
 from bot.di.ApplicationContainer import ApplicationContainer
 from bot.domain.MessengerApi import MessengerApi
 from bot.presentation.SignalController import SignalController
-from bot.presentation.logger.BotLogger import BotLogger
 
 
 class CryptoBot:
