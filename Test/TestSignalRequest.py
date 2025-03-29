@@ -6,13 +6,15 @@ import requests
 #url = 'https://77.232.135.88/position'
 url = 'https://werrewq-cryptobot-719a.twc1.net'
 
-# {"signal":"{{strategy.order.comment}}","token":"2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2","side":"{{strategy.order.action}}"}
+# jsonData = '{"signal": "open_long", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# alert(jsonData)
 
-# alert("{" +
-#           "\"action\": \"set_stop_loss\"," +
-#           "\"stop_loss\": " + str.tostring(stopLossPrice) + "," +
-#           "\"entry_price\": " + str.tostring(close) +
-#           "}", alert.freq_once_per_bar)
+# price = str.tostring(2.1)
+# jsonData = '{"signal": "stop_loss", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2", "side":"' + side + '", "stop_price":"' + price + '"}'
+# alert(jsonData)
+
+# strategy.entry("SELL", strategy.short, comment="open_short")
+# jsonData = '{"signal": "open_short", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
 
 # Заголовки запроса
 headers = {
