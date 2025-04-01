@@ -46,7 +46,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     retry_request_handler_fabric: RetryRequestHandlerFabric = providers.Singleton(
         RetryRequestHandlerFabric,
-        messenger_api = messenger_api,
+        messenger = messenger_api,
     )
 
     signal_to_intent_mapper = providers.Factory(
