@@ -5,6 +5,7 @@ from pybit import exceptions
 from bot.config.SecuredConfig import SecuredConfig
 from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty, floor_price
 from bot.data.api.CoinPairInfo import CoinPairInfo
+from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from pybit.unified_trading import HTTP
@@ -19,13 +20,21 @@ class BybitApi(BrokerApi):
     __client: HTTP
     __coin_pair_info: CoinPairInfo
     __trading_logger: TradingLogger
+    __retry_request_fabric: RetryRequestHandlerFabric
 
-    def __init__(self, trading_config: TradingConfig, trading_logger: TradingLogger,  secured_config: SecuredConfig):
+    def __init__(
+            self,
+            trading_config: TradingConfig,
+            trading_logger: TradingLogger,
+            secured_config: SecuredConfig,
+            retry_request_fabric:RetryRequestHandlerFabric,
+    ):
         print("BybitApi init")
         self.__connect_to_api(trading_config, secured_config)
         self.__coin_pair_info = self.get_filters(trading_config)
         self.__set_leverage(trading_config)
         self.__trading_logger = trading_logger
+        self.__retry_request_fabric = retry_request_fabric
 
     def __connect_to_api(self, trading_config: TradingConfig, secured_config: SecuredConfig):
         print("try to connect to Api")
@@ -87,22 +96,24 @@ class BybitApi(BrokerApi):
     def place_buy_order(self, long_intent: LongIntent):
         side = "Buy"
         pair_name = long_intent.trading_config.target_coin_name + long_intent.trading_config.asset_name
-        return self.__place_order(
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda : self.__place_order(
             coin_name=pair_name,
             asset_name = long_intent.trading_config.asset_name,
             side=side,
             trading_config=long_intent.trading_config,
-        )
+        ))
 
     def place_sell_order(self, short_intent: ShortIntent):
         side = "Sell"
         pair_name = short_intent.trading_config.target_coin_name + short_intent.trading_config.asset_name
-        return self.__place_order(
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__place_order(
             coin_name=pair_name,
             asset_name = short_intent.trading_config.asset_name,
             side=side,
             trading_config=short_intent.trading_config,
-        )
+        ))
 
     def __place_order(
             self,
@@ -180,7 +191,7 @@ class BybitApi(BrokerApi):
             orderType="Market",
             time_in_force="GoodTillCancel",
             #qty=0.0000000000000000001
-            qty=order_value,
+            qty=str(order_value),
         )
 
         logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n"+ str(r))
@@ -236,12 +247,15 @@ class BybitApi(BrokerApi):
     def close_short_position(self, trading_config: TradingConfig):
         side = "Buy"
         pair_name = trading_config.target_coin_name + trading_config.asset_name
-        self.__close_position(pair_name, side)
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        retry_handler.handle(lambda: self.__close_position(pair_name, side))
+
 
     def close_long_position(self, trading_config: TradingConfig):
         side = "Sell"
         pair_name = trading_config.target_coin_name + trading_config.asset_name
-        self.__close_position(pair_name, side)
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        retry_handler.handle(lambda: self.__close_position(pair_name, side))
 
     def __close_position(self, pair_name, side):
 
@@ -269,8 +283,6 @@ class BybitApi(BrokerApi):
         )
 
     def __set_leverage(self, trading_config: TradingConfig):
-        if trading_config.leverage <= 1:
-            return
         try:
             r = self.__client.set_leverage(
                 category=MARKET_CATEGORY,
@@ -285,10 +297,11 @@ class BybitApi(BrokerApi):
             else:
                 logging.error(f"InvalidRequestError set_leverage Error {e.message}")
 
-
-
-
     def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__client_set_stop_loss(stop_loss_intent))
+
+    def __client_set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
         config: TradingConfig = stop_loss_intent.trading_config
         pair_name = config.target_coin_name + config.asset_name
         trigger_price = stop_loss_intent.trigger_price

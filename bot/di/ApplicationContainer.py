@@ -4,6 +4,7 @@ from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.data.api.BybitErrorHandler import BybitErrorHandler
+from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
@@ -43,6 +44,11 @@ class ApplicationContainer(containers.DeclarativeContainer):
         secured_config = secured_config,
     )
 
+    retry_request_handler_fabric: RetryRequestHandlerFabric = providers.Singleton(
+        RetryRequestHandlerFabric,
+        messenger_api = messenger_api,
+    )
+
     signal_to_intent_mapper = providers.Factory(
         SignalToIntentMapper,
         trading_config = trading_config,
@@ -53,6 +59,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         trading_config = trading_config,
         trading_logger = trading_logger,
         secured_config = secured_config,
+        retry_request_fabric = retry_request_handler_fabric
     )
 
     close_short_usecase = providers.Factory(
