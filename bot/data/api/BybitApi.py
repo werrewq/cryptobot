@@ -137,6 +137,8 @@ class BybitApi(BrokerApi):
             qty = floor_qty(assets_for_order / curr_price, self.__coin_pair_info)  # переводим USDT в целевую валюту
         if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
 
+        qty = qty * trading_config.leverage # умножаем количество на размер плеча
+
         order_message = f'''Совершена сделка:\nТип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
 
         result = self.__api_place_order(
