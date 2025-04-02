@@ -82,12 +82,8 @@ class BybitApi(BrokerApi):
         wallet_balance = None
         result = r['result']
         wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
-        coins = wallet['coin']
-        for coin in coins:
-            if coin['coin'] == coin_name:
-                wallet_balance = coin['walletBalance']
-                break
-        print(f"wallet_balance = {wallet_balance}")
+        wallet_balance = wallet['totalAvailableBalance']
+        print(f"totalAvailableBalance = {wallet_balance}")
         if wallet_balance is not None and wallet_balance != "":
             return float(wallet_balance)
         else:
