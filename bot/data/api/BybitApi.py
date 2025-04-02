@@ -135,7 +135,8 @@ class BybitApi(BrokerApi):
 
         qty = qty * trading_config.leverage # умножаем количество на размер плеча
 
-        order_message = f'''Совершена сделка:\nТип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
+        order_message = f'''Тип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
+        logging.debug("Параметры будующей сделки: \n" + str(order_message))
 
         result = self.__api_place_order(
             coin_name,
@@ -193,7 +194,7 @@ class BybitApi(BrokerApi):
         )
 
         logging.debug("ПОСЛЕ ОТВЕТА BYBIT \n"+ str(r))
-        return order_message
+        return "Совершена сделка:\n" + order_message
 
     def __place_limit_order(self, name, side, price):
         # r = cl.get_instruments_info(category="spot", symbol="SOLUSDT")

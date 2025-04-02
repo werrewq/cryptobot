@@ -38,7 +38,7 @@ class BotLogger:
         return file_handler
 
     def set_logs_format(self, console_handler, file_handler):
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
