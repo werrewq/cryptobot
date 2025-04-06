@@ -69,14 +69,14 @@ class TelegramApi(MessengerApi):
             logging.debug("Telebot handle message " + message.text)
             if message.text == "Торговать":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот начинает торговать.")
-                self.trading_status = TradingStatus.ONLINE
+                self.__trading_status = TradingStatus.ONLINE
             elif message.text == "Остановка":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот засыпает.")
-                self.trading_status = TradingStatus.OFFLINE
+                self.__trading_status = TradingStatus.OFFLINE
 
     def send_message(self, message: str):
         if self.__chat_id is not None:
             self.bot.send_message(chat_id = self.__chat_id, text=message)
 
     def get_bot_trading_status(self) -> TradingStatus:
-        return self.trading_status
+        return self.__trading_status
