@@ -6,18 +6,21 @@ import telebot
 from telebot import types
 
 from bot.config.SecuredConfig import SecuredConfig
-from bot.domain.MessengerApi import MessengerApi, TradingStatus
+from bot.domain.MessengerApi import MessengerApi
+from bot.presentation.messenger.MessageHandler import MessageHandler
+
 
 class TelegramApi(MessengerApi):
-    trading_status: TradingStatus # TODO убрать в логику
     bot: telebot.TeleBot
     __chat_id: Optional[int]
+    __message_handler: MessageHandler
 
-    def __init__(self, secured_config: SecuredConfig):
-        self.__trading_status = TradingStatus.OFFLINE
+    def __init__(self, secured_config: SecuredConfig, message_handler:MessageHandler):
         self.bot = telebot.TeleBot(secured_config.get_telegram_bot_api_token())
         self.setup_handlers()
         self.__chat_id = None
+        self.__message_handler = message_handler
+
 
     def run(self):
         threading.Thread(target=self.start_polling).start()
@@ -67,6 +70,9 @@ class TelegramApi(MessengerApi):
         @self.bot.message_handler(func=lambda message: True)
         def handle_message(message):
             logging.debug("Telebot handle message " + message.text)
+            send_message = lambda txt: self.bot.send_message(message.chat.id, txt)
+            self.__message_handler.handle_message(message.text, send_message)
+
             if message.text == "Торговать":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот начинает торговать.")
                 self.__trading_status = TradingStatus.ONLINE
