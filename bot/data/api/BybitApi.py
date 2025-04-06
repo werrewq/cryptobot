@@ -99,7 +99,7 @@ class BybitApi(BrokerApi):
         side = "Buy"
         pair_name = long_intent.trading_config.target_coin_name + long_intent.trading_config.asset_name
         retry_handler = self.__retry_request_fabric.create(request_limit=3)
-        return retry_handler.handle(lambda : self.__place_order(
+        return retry_handler.handle(lambda : self.__prepare_order(
             coin_name=pair_name,
             asset_name = long_intent.trading_config.asset_name,
             side=side,
@@ -110,14 +110,14 @@ class BybitApi(BrokerApi):
         side = "Sell"
         pair_name = short_intent.trading_config.target_coin_name + short_intent.trading_config.asset_name
         retry_handler = self.__retry_request_fabric.create(request_limit=3)
-        return retry_handler.handle(lambda: self.__place_order(
+        return retry_handler.handle(lambda: self.__prepare_order(
             coin_name=pair_name,
             asset_name = short_intent.trading_config.asset_name,
             side=side,
             trading_config=short_intent.trading_config,
         ))
 
-    def __place_order(
+    def __prepare_order(
             self,
             coin_name,
             asset_name,
@@ -136,10 +136,11 @@ class BybitApi(BrokerApi):
             qty = assets_for_order
         else:  # если обмениваем USDT на что-то, то мы указываем количество целевой валюты к покупке, т.е. Nпокупка = Nusdt / CoinPrice
             assets_for_order = available_assets / 100 * trading_config.order_volume_percent_of_capital # cчитаем на сколько будем торговать
-            qty = floor_qty(assets_for_order / curr_price, self.__coin_pair_info)  # переводим USDT в целевую валюту
-        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
+            qty = assets_for_order / curr_price, self.__coin_pair_info  # переводим USDT в целевую валюту
 
-        qty = qty * trading_config.leverage # умножаем количество на размер плеча
+        qty = floor_qty(qty * trading_config.leverage, self.__coin_pair_info) # умножаем количество на размер плеча
+
+        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
 
         order_message = f'''Тип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
         logging.debug("Параметры будующей сделки: \n" + str(order_message))
