@@ -25,5 +25,6 @@ class TradingConfigProvider:
                 asset_name = trading_config_json['asset_name'],
                 leverage = trading_config_json['leverage'],
                 testnet = trading_config_json['testnet'],
-                test_env_vars= test_env_vars
+                test_env_vars = test_env_vars,
+                demo = trading_config_json['demo'],
             )

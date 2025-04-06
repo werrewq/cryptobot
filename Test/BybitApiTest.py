@@ -3,7 +3,7 @@ from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
-from bot.domain.dto.TradeIntent import ShortIntent, LongIntent
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.TradingLogger import TradingLogger
 
@@ -17,7 +17,8 @@ def place_sell_order():
         trading_config= trading_config,
         side="sell"
     )
-    api.place_sell_order(intent)
+    res = api.place_sell_order(intent)
+    print(res)
 
 def have_long_order():
     print(api.have_order_long(trading_config))
@@ -42,7 +43,14 @@ def place_buy_order():
 def get_filters():
     api.get_filters(trading_config)
 
+def set_stop_loss():
+    intent = StopLossIntent(trading_config, side= "Sell", trigger_price=115)
+    api.set_stop_loss(intent)
+
+def cancel_all_orders():
+    api.cancel_all_active_orders(trading_config)
+
 if __name__ == '__main__':
-    get_assets()
+    cancel_all_orders()
 
 

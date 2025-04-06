@@ -8,3 +8,4 @@ class TradingConfig:
     leverage: int
     testnet: bool
     test_env_vars: bool
+    demo: bool

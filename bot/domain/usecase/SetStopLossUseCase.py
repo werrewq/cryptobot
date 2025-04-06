@@ -15,6 +15,8 @@ class SetStopLossUseCase:
         self.__bot_set_stop_loss(stop_loss_intent)
 
     def __bot_set_stop_loss(self, stop_loss_intent: StopLossIntent):
+        self.messenger_api.send_message(message="Пробуем закрыть все старые ордера")
+        self.broker_api.cancel_all_active_orders(stop_loss_intent.trading_config)
         self.messenger_api.send_message(message="Пробуем поставить STOP LOSS ⛔")
         message = self.broker_api.set_stop_loss(stop_loss_intent)
         self.messenger_api.send_message(message=message)

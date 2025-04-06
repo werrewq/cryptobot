@@ -3,7 +3,7 @@ from decimal import Decimal
 from pybit import exceptions
 
 from bot.config.SecuredConfig import SecuredConfig
-from bot.data.api.ApiHelpers import PositionType, float_trunc, round_down, floor_qty, floor_price
+from bot.data.api.ApiHelpers import PositionType, floor_qty, floor_price
 from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.BrokerApi import BrokerApi
@@ -37,12 +37,13 @@ class BybitApi(BrokerApi):
         self.__retry_request_fabric = retry_request_fabric
 
     def __connect_to_api(self, trading_config: TradingConfig, secured_config: SecuredConfig):
-        print("try to connect to Api")
+        logging.debug(f"Trying connect to Api with demo={str(trading_config.demo)}, testnet={str(trading_config.testnet)}")
         self.__client = HTTP(
             api_key=secured_config.get_broker_api_key(),
             api_secret=secured_config.get_broker_secret_key(),
             recv_window=60000,
             testnet=trading_config.testnet,
+            demo=trading_config.demo,
         )
 
     def get_filters(self, trading_config: TradingConfig) -> CoinPairInfo:
@@ -58,6 +59,8 @@ class BybitApi(BrokerApi):
         price_decimals = int(c.get('priceScale', '4'))
         min_qty = float(min_qty)
 
+        logging.debug(f"Got filters for {pair_name}:\nprice_decimals={str(price_decimals)}\nqty_decimals={str(qty_decimals)}\nmin_qty={str(min_qty)}")
+
         return CoinPairInfo(
             price_decimals = price_decimals,
             qty_decimals = qty_decimals,
@@ -70,6 +73,8 @@ class BybitApi(BrokerApi):
         """
         tickers = self.__client.get_tickers(category=MARKET_CATEGORY, symbol=pair)
         r = float(tickers.get('result').get('list')[0].get('ask1Price'))
+
+        logging.debug(f"current price {pair} = {str(r)}")
         return r
 
     def get_assets(self, coin_name) -> float:
@@ -84,6 +89,7 @@ class BybitApi(BrokerApi):
         wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
         wallet_balance = wallet['totalAvailableBalance']
         print(f"totalAvailableBalance = {wallet_balance}")
+        logging.debug(f"totalAvailableBalance = {wallet_balance}")
         if wallet_balance is not None and wallet_balance != "":
             return float(wallet_balance)
         else:
@@ -189,7 +195,6 @@ class BybitApi(BrokerApi):
             side=side,
             orderType="Market",
             time_in_force="GoodTillCancel",
-            #qty=0.0000000000000000001
             qty=str(order_value),
         )
 
@@ -201,7 +206,6 @@ class BybitApi(BrokerApi):
         # print(r)
         self.__client.get_instruments_info(category="spot", symbol="SOLUSDT")
         available = self.get_assets(name)
-        print(available, round(available, 3), float_trunc(available, 3), float_trunc(available, 3))
 
         r = self.__client.place_order(
             category=MARKET_CATEGORY,
@@ -209,7 +213,7 @@ class BybitApi(BrokerApi):
             side=side,
             orderType="Market",
             time_in_force="GoodTillCancel",
-            qty=float_trunc(available, 3),
+            qty=floor_qty(available, self.__coin_pair_info),
         )
         r = self.__client.place_order(
             category=MARKET_CATEGORY,
@@ -217,8 +221,8 @@ class BybitApi(BrokerApi):
             side=side,
             orderType="Limit",
             time_in_force="GoodTillCancel",
-            qty=float_trunc(available, 3),
-            price=round_down(price * 0.99, 2),
+            qty=floor_qty(available, self.__coin_pair_info),
+            price=floor_price(price * 0.99, self.__coin_pair_info),
         )
 
         print(str(r))
