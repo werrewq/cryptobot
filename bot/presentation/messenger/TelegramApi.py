@@ -8,11 +8,8 @@ from telebot import types
 from bot.config.SecuredConfig import SecuredConfig
 from bot.domain.MessengerApi import MessengerApi, TradingStatus
 
-#t.me/SergeySignalBot
-# @SergeySignalBot
-
 class TelegramApi(MessengerApi):
-    __trading_status: TradingStatus
+    trading_status: TradingStatus # TODO убрать в логику
     bot: telebot.TeleBot
     __chat_id: Optional[int]
 
@@ -36,6 +33,28 @@ class TelegramApi(MessengerApi):
             markup = create_buttons()
             self.bot.send_message(message.chat.id, "Добро пожаловать!", reply_markup=markup)
 
+        # @bot.message_handler(func=lambda message: True)
+        # def handle_message(message):
+        #     user_id = message.from_user.id
+        #
+        #     # Проверяем, есть ли пользователь в состоянии ожидания пароля
+        #     if user_id not in user_states:
+        #         user_states[user_id] = False  # Пользователь еще не ввел пароль
+        #
+        #     if not user_states[user_id]:
+        #         # Если пользователь еще не ввел пароль, проверяем его
+        #         if message.text == PASSWORD:
+        #             user_states[user_id] = True  # Устанавливаем состояние как "введен пароль"
+        #             bot.send_message(message.chat.id, "Пароль верный! Теперь вы можете использовать команду /secret.")
+        #         else:
+        #             bot.send_message(message.chat.id, "Неверный пароль. Попробуйте снова.")
+        #     else:
+        #         # Если пароль уже введен, обрабатываем команды
+        #         if message.text == "/secret":
+        #             bot.send_message(message.chat.id, "Это секретное сообщение!")
+        #         else:
+        #             bot.send_message(message.chat.id, "Вы можете использовать команду /secret.")
+
         def create_buttons():
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button_start = types.KeyboardButton("Торговать")
@@ -50,14 +69,14 @@ class TelegramApi(MessengerApi):
             logging.debug("Telebot handle message " + message.text)
             if message.text == "Торговать":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот начинает торговать.")
-                self.__trading_status = TradingStatus.ONLINE
+                self.trading_status = TradingStatus.ONLINE
             elif message.text == "Остановка":
                 self.bot.send_message(message.chat.id, "Вы нажали на кнопку! Бот засыпает.")
-                self.__trading_status = TradingStatus.OFFLINE
+                self.trading_status = TradingStatus.OFFLINE
 
     def send_message(self, message: str):
         if self.__chat_id is not None:
             self.bot.send_message(chat_id = self.__chat_id, text=message)
 
     def get_bot_trading_status(self) -> TradingStatus:
-        return self.__trading_status
+        return self.trading_status
