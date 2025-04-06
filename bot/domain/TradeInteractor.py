@@ -1,11 +1,6 @@
-from enum import Enum
-
-from bot.domain.MessengerApi import MessengerApi
-from bot.domain.TradingStatusInteractor import TradingStatusInteractor, TradingStatus
+from bot.domain.MessengerApi import MessengerApi, TradingStatus
 from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent
 from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase
-
-
 
 
 class TradeInteractor:
@@ -13,7 +8,6 @@ class TradeInteractor:
     __open_short_usecase: OpenShortUseCase
     __messenger: MessengerApi
     __set_stop_loss_usecase: SetStopLossUseCase
-    __trading_status_interactor: TradingStatusInteractor
 
     def __init__(
             self,
@@ -21,18 +15,17 @@ class TradeInteractor:
             open_short_usecase,
             set_stop_loss_usecase,
             messenger_api: MessengerApi,
-            trading_status_interactor: TradingStatusInteractor,
     ):
         self.__open_long_usecase = open_long_usecase
         self.__open_short_usecase = open_short_usecase
         self.__messenger = messenger_api
         self.__set_stop_loss_usecase = set_stop_loss_usecase
-        self.__trading_status_interactor = trading_status_interactor
 
     def start_trade(self, trade_intent: TradeIntent):
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
-        trading_status = self.__trading_status_interactor.get_trading_status()
+        trading_status = self.__messenger.get_bot_trading_status()
         if trading_status == TradingStatus.OFFLINE:
+            print("TradingStatus.OFFLINE")
             self.__messenger.send_message("Бот не торгует, статус OFFLINE " + trade_intent.trading_config.target_coin_name)
             return
 
@@ -48,4 +41,3 @@ class TradeInteractor:
 
             case _:
                 raise TypeError('Unsupported type')
-
