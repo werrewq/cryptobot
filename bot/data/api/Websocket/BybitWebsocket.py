@@ -1,59 +1,54 @@
 from time import sleep
 
-# # Import WebSocket from the unified_trading module.
-# from pybit.unified_trading import WebSocket
-#
-# # Set up logging (optional)
-# import logging
-# logging.basicConfig(filename="pybit.log", level=logging.DEBUG,
-#                     format="%(asctime)s %(levelname)s %(message)s")
-#
-#
-# # Connect with authentication!
-# # Here, we are connecting to the "linear" WebSocket, which will deliver public
-# # market data for the linear (USDT) perpetuals.
-# # The available channel types are, for public market data:
-# #    inverse – Inverse Contracts;
-# #    linear  – USDT Perpetual, USDC Contracts;
-# #    spot    – Spot Trading;
-# #    option  – USDC Options;
-# # and for private data:
-# #    private – Private account data for all markets.
-#
-# ws = WebSocket(
-#     testnet=True,
-#     channel_type="linear",
-# )
-#
-# ws_private = WebSocket(
-#     testnet=True,
-#     channel_type="private",
-#     api_key="...",
-#     api_secret="...",
-#     trace_logging=True,
-# )
-#
-#
-# # Let's fetch the orderbook for BTCUSDT. First, we'll define a function.
-# def handle_orderbook(message):
-#     # I will be called every time there is new orderbook data!
-#     print(message)
-#     orderbook_data = message["data"]
-#
-# # Now, we can subscribe to the orderbook stream and pass our arguments:
-# # our depth, symbol, and callback function.
-# ws.orderbook_stream(50, "BTCUSDT", handle_orderbook)
-#
-#
-# # To subscribe to private data, the process is the same:
-# def handle_position(message):
-#     # I will be called every time there is new position data!
-#     print(message)
-#
-# ws_private.position_stream(handle_position)
-#
-#
-# while True:
-#     # This while loop is required for the program to run. You may execute
-#     # additional code for your trading logic here.
-#     sleep(1)
+from pybit.unified_trading import WebSocket
+
+from bot.config.SecuredConfig import SecuredConfig
+from bot.domain.dto.TradingConfig import TradingConfig
+
+MARKET_CATEGORY = "linear"
+
+class BybitWebsocket:
+    __websocket: WebSocket
+    __trading_config: TradingConfig
+
+    def __init__(
+            self,
+            secured_config: SecuredConfig,
+            trading_config: TradingConfig,
+            channel_type: str
+    ):
+        self.__trading_config = trading_config
+        self.__websocket = WebSocket(
+            demo=trading_config.demo,
+            testnet=trading_config.testnet,
+            channel_type=channel_type,
+            api_key=secured_config.get_broker_api_key(),
+            api_secret=secured_config.get_broker_secret_key(),
+            callback_function=self.handle_message
+        )
+
+    def handle_message(self, m):
+        print(str(m))
+
+    def subscribe_to_ticker(self):
+        """
+        Подписка на каналы на все торгуемую пару,
+        :param ws:
+        :return:
+        """
+        symbol = self.__trading_config.target_coin_name + self.__trading_config.asset_name
+
+        self.__websocket.ticker_stream(symbol=symbol, callback=handle_ticker)
+
+    def subscribe_to_wallet(self):
+        self.__websocket.wallet_stream(callback=handle_wallet)
+        while True:
+            sleep(1)
+
+def handle_ticker(m):
+    print(str(m))
+    d = m.get('data', {})
+    print(d['symbol'], d['lastPrice'], sep=":")
+
+def handle_wallet(m):
+    print(str(m))
