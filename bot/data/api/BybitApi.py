@@ -136,14 +136,14 @@ class BybitApi(BrokerApi):
             qty = assets_for_order
         else:  # если обмениваем USDT на что-то, то мы указываем количество целевой валюты к покупке, т.е. Nпокупка = Nusdt / CoinPrice
             assets_for_order = available_assets / 100 * trading_config.order_volume_percent_of_capital # cчитаем на сколько будем торговать
-            qty = assets_for_order / curr_price, self.__coin_pair_info  # переводим USDT в целевую валюту
+            qty = assets_for_order / curr_price  # переводим USDT в целевую валюту
 
-        qty = floor_qty(qty * trading_config.leverage, self.__coin_pair_info) # умножаем количество на размер плеча
+        qty = qty * trading_config.leverage # умножаем количество на размер плеча
+        qty = floor_qty(qty, self.__coin_pair_info)
 
         if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
 
         order_message = f'''Тип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
-        logging.debug("Параметры будующей сделки: \n" + str(order_message))
 
         result = self.__api_place_order(
             coin_name,

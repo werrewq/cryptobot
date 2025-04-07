@@ -12,13 +12,13 @@ def count_decimal_places(str_number: str) -> int:
         return len(str_number.split('.')[1])
     return 0  # Если дробной части нет
 
-def floor_qty(value, coin_pair_info: CoinPairInfo):
+def floor_qty(value: float, coin_pair_info: CoinPairInfo):
     return _floor(value, coin_pair_info.qty_decimals)
 
 def floor_price(value, coin_pair_info: CoinPairInfo):
     return _floor(value, coin_pair_info.price_decimals)
 
-def _floor(value, decimals):
+def _floor(value: float, decimals: int):
     """
     Для аргументов цены нужно отбросить (округлить вниз)
     до колва знаков заданных в фильтрах цены
