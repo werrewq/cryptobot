@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from decimal import *
 
@@ -22,7 +23,8 @@ def _floor(value, decimals):
     Для аргументов цены нужно отбросить (округлить вниз)
     до колва знаков заданных в фильтрах цены
     """
-    d_value = Decimal(value)
+    logging.debug(f"_floor value = {value}, decimals = {decimals} \n")
+    d_value = Decimal(str(value))
     d_factor = Decimal('1.' + '0' * decimals)
     # Округляем вниз
     res = d_value.quantize(d_factor, rounding=ROUND_FLOOR)
