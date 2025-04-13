@@ -1,6 +1,7 @@
 import abc
 import os
 
+from bot.config.Decrypter import Decrypter
 from bot.domain.dto.TradingConfig import TradingConfig
 
 # test_broker_api_key = "6pAf7l2HZn46GqJqu6"
@@ -19,6 +20,12 @@ test_broker_secret_key = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
 # only server
 # test_broker_api_key ZcNKoTlZYkouIPeXGE
 # test_broker_secret_key 3EEwQjfzXwyOh72bHjQEB7prHQEBODIk044E
+
+# ENCRYPTED TEST DATA:
+test_broker_api_key="XOw+/iFqNt9uIg2Xb4aHWhGJgaVBQZNdbsjDE1osaGHn3Q=="
+test_broker_secret_key="z41bJjQ/fdSRRSN9dDjEqP/X8h8UVwW26n4OYWtN0h3E/rOQ+j0jAo/AvfhdDCg2vcj8iQ=="
+test_telegram_bot_api_token="nkehNJmDNtREwe9bD7fCMED0UrLitJc8kMrcHtxUYmJ7Ky7vMSLwY68t3P4Js991xG67qXPskQvi51MjGA0="
+test_cryptobot_api_token="ZneAYlbPyFn7YSHGNbMhbTi2doRmuMjwptnsMfudU1ekO1u2LwnwBP0acyGR/6moUaR6dXFS3mRMbXsoN1/DeXE3G5Ygat9lSWb7O3KkgSk="
 
 class EnvironmentVariables:
 
@@ -66,21 +73,27 @@ class OsEnvironmentVariables(EnvironmentVariables):
 
 class SecuredConfig(EnvironmentVariables):
     __environment_variables: EnvironmentVariables
+    __decrypter: Decrypter
 
-    def __init__(self, trading_config: TradingConfig):
+    def __init__(self, trading_config: TradingConfig, decrypter: Decrypter):
         if trading_config.test_env_vars:
             self.__environment_variables = TestEnvironmentVariables()
         else:
             self.__environment_variables = OsEnvironmentVariables()
+        self.__decrypter = decrypter
 
     def get_broker_api_key(self) -> str:
-        return self.__environment_variables.get_broker_api_key()
+        key = self.__environment_variables.get_broker_api_key()
+        return self.__decrypter.decrypt(key)
 
     def get_broker_secret_key(self) -> str:
-        return self.__environment_variables.get_broker_secret_key()
+        key = self.__environment_variables.get_broker_secret_key()
+        return self.__decrypter.decrypt(key)
 
     def get_telegram_bot_api_token(self) -> str:
-        return self.__environment_variables.get_telegram_bot_api_token()
+        key = self.__environment_variables.get_telegram_bot_api_token()
+        return self.__decrypter.decrypt(key)
 
     def get_cryptobot_api_token(self) -> str:
-        return self.__environment_variables.get_cryptobot_api_token()
+        key = self.__environment_variables.get_cryptobot_api_token()
+        return self.__decrypter.decrypt(key)

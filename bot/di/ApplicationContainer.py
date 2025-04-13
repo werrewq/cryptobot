@@ -1,5 +1,6 @@
 from dependency_injector import containers, providers
 
+from bot.config.Decrypter import Decrypter
 from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
@@ -26,9 +27,15 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     trading_config: TradingConfig = TradingConfigProvider().provide()
 
+    decrypter: Decrypter = providers.Singleton(
+        Decrypter,
+        key = b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd'
+    )
+
     secured_config: SecuredConfig = providers.Singleton(
         SecuredConfig,
-        trading_config
+        trading_config = trading_config,
+        decrypter = decrypter,
     )
 
     logger = providers.Singleton(
