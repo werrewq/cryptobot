@@ -1,7 +1,9 @@
 from Test.MessengerApiMock import MessengerApiMock
+from bot.config.Decrypter import Decrypter
 from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
+from bot.data.api.BybitInteractor import BybitInteractor
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from bot.domain.dto.TradingConfig import TradingConfig
@@ -9,8 +11,14 @@ from bot.presentation.logger.TradingLogger import TradingLogger
 
 trading_config: TradingConfig = TradingConfigProvider().provide(test=True)
 retry_request_handler_fabric = RetryRequestHandlerFabric(MessengerApiMock())
-
-api = BybitApi(trading_config, TradingLogger(), SecuredConfig(trading_config), retry_request_handler_fabric)
+decrypter = Decrypter(b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd')
+bybit_api = BybitApi(trading_config, SecuredConfig(trading_config, decrypter = decrypter))
+api = BybitInteractor(
+    bybit_api= bybit_api,
+    retry_request_fabric= retry_request_handler_fabric,
+    trading_logger= TradingLogger(),
+    trading_config= trading_config
+)
 
 def place_sell_order():
     intent = ShortIntent(

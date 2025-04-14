@@ -5,6 +5,7 @@ from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.data.api.BybitErrorHandler import BybitErrorHandler
+from bot.data.api.BybitInteractor import BybitInteractor
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.ErrorHandler import ErrorHandler
@@ -80,12 +81,18 @@ class ApplicationContainer(containers.DeclarativeContainer):
         trading_config = trading_config,
     )
 
-    broker_api: BrokerApi = providers.Singleton(
+    bybit_api: BybitApi = providers.Singleton(
         BybitApi,
+        trading_config=trading_config,
+        secured_config=secured_config,
+    )
+
+    broker_api: BrokerApi = providers.Singleton(
+        BybitInteractor,
+        bybit_api = bybit_api,
+        retry_request_fabric=retry_request_handler_fabric,
         trading_config = trading_config,
         trading_logger = trading_logger,
-        secured_config = secured_config,
-        retry_request_fabric = retry_request_handler_fabric
     )
 
     close_short_usecase = providers.Factory(
