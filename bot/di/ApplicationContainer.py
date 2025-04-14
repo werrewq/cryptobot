@@ -10,6 +10,7 @@ from bot.domain.BrokerApi import BrokerApi
 from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
+from bot.domain.TradingStatusInteractor import TradingStatusInteractor
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
@@ -20,6 +21,8 @@ from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
+from bot.presentation.messenger.AuthManager import AuthManager
+from bot.presentation.messenger.MessagePresenter import MessagePresenter
 from bot.presentation.messenger.TelegramApi import TelegramApi
 
 
@@ -46,9 +49,25 @@ class ApplicationContainer(containers.DeclarativeContainer):
         TradingLogger
     )
 
+    auth_manager: AuthManager = providers.Singleton(
+        AuthManager,
+        secured_config = secured_config
+    )
+
+    trading_status_interactor: TradingStatusInteractor = providers.Singleton(
+        TradingStatusInteractor,
+    )
+
+    message_presenter: MessagePresenter = providers.Singleton(
+        MessagePresenter,
+        trading_status_interactor = trading_status_interactor,
+        auth_manager = auth_manager
+    )
+
     messenger_api: MessengerApi = providers.Singleton(
         TelegramApi,
         secured_config = secured_config,
+        message_presenter = message_presenter,
     )
 
     retry_request_handler_fabric: RetryRequestHandlerFabric = providers.Singleton(
@@ -107,6 +126,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         open_short_usecase = open_short_usecase,
         set_stop_loss_usecase = set_stop_loss_usecase,
         messenger_api = messenger_api,
+        trading_status_interactor = trading_status_interactor
     )
 
     error_handler: ErrorHandler = providers.Singleton(

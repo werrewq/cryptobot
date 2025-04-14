@@ -1,4 +1,4 @@
-from enum import Enum
+import logging
 
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor, TradingStatus
@@ -33,7 +33,8 @@ class TradeInteractor:
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
         trading_status = self.__trading_status_interactor.get_trading_status()
         if trading_status == TradingStatus.OFFLINE:
-            self.__messenger.send_message("Бот не торгует, статус OFFLINE " + trade_intent.trading_config.target_coin_name)
+            logging.debug("set_trading_status == " + str(trading_status.value))
+            self.__messenger.send_message("Бот не торгует, статус OFFLINE")
             return
 
         match trade_intent:

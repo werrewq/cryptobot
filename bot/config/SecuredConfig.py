@@ -4,6 +4,8 @@ import os
 from bot.config.Decrypter import Decrypter
 from bot.domain.dto.TradingConfig import TradingConfig
 
+test_chat_pass = "qwerty"
+
 # test_broker_api_key = "6pAf7l2HZn46GqJqu6"
 # test_broker_secret_key = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
 test_telegram_bot_api_token = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk"
@@ -45,7 +47,15 @@ class EnvironmentVariables:
     def get_cryptobot_api_token(self) -> str:
         pass
 
+    @abc.abstractmethod
+    def get_chat_pass(self) -> str:
+        pass
+
 class TestEnvironmentVariables(EnvironmentVariables):
+
+    def get_chat_pass(self) -> str:
+        return test_chat_pass
+
     def get_broker_api_key(self) -> str:
         return test_broker_api_key
 
@@ -59,6 +69,10 @@ class TestEnvironmentVariables(EnvironmentVariables):
         return test_cryptobot_api_token
 
 class OsEnvironmentVariables(EnvironmentVariables):
+
+    def get_chat_pass(self) -> str:
+        return os.environ["CHAT_PASS"]
+
     def get_broker_api_key(self) -> str:
         return os.environ["BROKER_API_KEY"]
 
@@ -97,3 +111,6 @@ class SecuredConfig(EnvironmentVariables):
     def get_cryptobot_api_token(self) -> str:
         key = self.__environment_variables.get_cryptobot_api_token()
         return self.__decrypter.decrypt(key)
+
+    def get_chat_pass(self):
+        return self.__environment_variables.get_chat_pass()
