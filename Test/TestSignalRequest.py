@@ -4,9 +4,9 @@ import requests
 
 #url = 'http://localhost:8000'
 #url = 'https://77.232.135.88/position'
-url = 'https://werrewq-cryptobot-719a.twc1.net'
+#url = 'https://werrewq-cryptobot-719a.twc1.net'
 #url = 'https://werrewq-cryptobot-6169.twc1.net' # Quail
-#url = 'https://werrewq-cryptobot-cba7.twc1.net' # Bittern
+url = 'https://werrewq-cryptobot-cba7.twc1.net' # Bittern
 
 # jsonData = '{"signal": "open_long", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
 # alert(jsonData)
