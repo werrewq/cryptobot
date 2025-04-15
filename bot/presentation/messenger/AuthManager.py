@@ -5,7 +5,7 @@ from bot.config.SecuredConfig import SecuredConfig
 
 class AuthManager:
     __chat_pass: str
-    __authenticated_chat_id: Optional[int]
+    __authenticated_chat_id: Optional[int] = None
 
     def __init__(self, secured_config: SecuredConfig):
         self.__chat_pass = secured_config.get_chat_pass()
