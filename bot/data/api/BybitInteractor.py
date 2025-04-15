@@ -76,7 +76,6 @@ class BybitInteractor(BrokerApi):
         result = r['result']
         wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
         wallet_balance = wallet['totalAvailableBalance']
-        print(f"totalAvailableBalance = {wallet_balance}")
         logging.debug(f"totalAvailableBalance = {wallet_balance}")
         if wallet_balance is not None and wallet_balance != "":
             return float(wallet_balance)
@@ -100,12 +99,14 @@ class BybitInteractor(BrokerApi):
         return have_order
 
     def close_short_position(self, trading_config: TradingConfig):
+        logging.debug(f"close_short_position")
         side = "Buy"
         pair_name = trading_config.target_coin_name + trading_config.asset_name
         retry_handler = self.__retry_request_fabric.create(request_limit=3)
         retry_handler.handle(lambda: self.__bybit_api.close_position(pair_name, side))
 
     def close_long_position(self, trading_config: TradingConfig):
+        logging.debug(f"close_long_position")
         side = "Sell"
         pair_name = trading_config.target_coin_name + trading_config.asset_name
         retry_handler = self.__retry_request_fabric.create(request_limit=3)

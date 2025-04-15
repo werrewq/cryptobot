@@ -7,8 +7,11 @@ from bot.data.api.BybitInteractor import BybitInteractor
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
 from bot.domain.dto.TradingConfig import TradingConfig
+from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
 
+loger = BotLogger()
+loger.run()
 trading_config: TradingConfig = TradingConfigProvider().provide(test=True)
 retry_request_handler_fabric = RetryRequestHandlerFabric(MessengerApiMock())
 decrypter = Decrypter(b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd')
@@ -59,6 +62,6 @@ def cancel_all_orders():
     api.cancel_all_active_orders(trading_config)
 
 if __name__ == '__main__':
-    cancel_all_orders()
+    get_filters()
 
 
