@@ -33,7 +33,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     decrypter: Decrypter = providers.Singleton(
         Decrypter,
-        key = b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd'
+        key = b'\x9fY\x8c\xa7\xdf$[\xdeg\xcd\xd6\xf2\xc6\xb9[D\x9b\x03\xf8\xe4lZ\xf4%\xb7\xb0\xcc\x19\xe7\x89\xaf\xf1'
     )
 
     secured_config: SecuredConfig = providers.Singleton(
