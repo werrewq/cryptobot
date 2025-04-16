@@ -19,7 +19,6 @@ class TelegramApi(MessengerApi):
     def __init__(self, secured_config: SecuredConfig, message_presenter:MessagePresenter):
         self.bot = telebot.TeleBot(secured_config.get_telegram_bot_api_token())
         self.setup_handlers()
-        self.__chat_id = None
         self.__message_presenter = message_presenter
         message_presenter.attach_to_view(self)
 
@@ -70,6 +69,6 @@ class TelegramApi(MessengerApi):
         chat_id = self.__message_presenter.get_authenticated_user_id()
         logging.debug(f"send_message to chat {str(chat_id)}")
         if chat_id is not None:
-            self.bot.send_message(chat_id = self.__chat_id, text=message)
+            self.bot.send_message(chat_id = self.__message_presenter.get_authenticated_user_id(), text=message)
         else:
             logging.debug(f"send_message chat not yet attached")
