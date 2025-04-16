@@ -78,6 +78,21 @@ class TestMessagePresenter(unittest.TestCase):
         # Проверяем результаты
         api_mock.send_message_to_id.assert_called_with("Бот уже используется другим пользователем", 7)
 
+    def test_get_authenticated_user_id(self):
+        presenter = prepare_presenter()
+        api_mock = Mock()
+        # Подключаем мок к презентеру
+        presenter.attach_to_view(api_mock)
+        # Проходим аунтентификацию
+        presenter.handle_message("qwerty",chat_id=42)
+        # Проверяем аунтентификацию
+        api_mock.send_message_to_id.assert_called_with("Вы успешно авторизировались! Бот готов к работе.", 42)
+        api_mock.show_trade_buttons.assert_called_once_with(42)
+        # Проверяем id чата
+        result = presenter.get_authenticated_user_id()
+        # Проверяем результаты
+        self.assertEqual(result, 42)
+
 # Запускаем тесты
 if __name__ == '__main__':
     unittest.main()

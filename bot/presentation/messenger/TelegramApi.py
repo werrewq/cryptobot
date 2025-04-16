@@ -1,6 +1,7 @@
 import logging
 import threading
 import traceback
+from http.cookiejar import debug
 
 import telebot
 from telebot import types
@@ -42,7 +43,7 @@ class TelegramApi(MessengerApi):
         @self.bot.message_handler(commands=['start'])
         def send_welcome(message):
             print("Telebot start message")
-            self.bot.send_message(message.chat.id, "Введите пароль:")
+            self.__message_presenter.handle_send_welcome(message.chat.id)
 
         # Обработчик текстовых сообщений
         @self.bot.message_handler(func=lambda message: True)
@@ -67,5 +68,8 @@ class TelegramApi(MessengerApi):
 
     def send_message(self, message: str):
         chat_id = self.__message_presenter.get_authenticated_user_id()
+        logging.debug(f"send_message to chat {str(chat_id)}")
         if chat_id is not None:
             self.bot.send_message(chat_id = self.__chat_id, text=message)
+        else:
+            logging.debug(f"send_message chat not yet attached")

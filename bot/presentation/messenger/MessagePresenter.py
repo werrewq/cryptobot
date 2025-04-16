@@ -18,6 +18,13 @@ class MessagePresenter:
     def attach_to_view(self, messenger_api: MessengerApi):
         self.__messenger_view = messenger_api
 
+    def handle_send_welcome(self, chat_id: int):
+        if self.__auth_manager.is_authenticated(chat_id):
+            self.__messenger_view.send_message_to_id("Поздравляем! Вы уже авторизированы, начните торговлю.", chat_id)
+            self.__messenger_view.show_trade_buttons(chat_id)
+        else:
+            self.__messenger_view.send_message_to_id("Введите пароль:", chat_id)
+
     def handle_message(self, message: str, chat_id: int):
         if self.__auth_manager.is_authenticated(chat_id):
             self.__handle_simple_message(message, chat_id)
