@@ -4,3 +4,4 @@ pybit==5.9.0
 dependency-injector==4.45.0
 gunicorn==23.0.0
 cryptography==44.0.2
+tinkoff-investments==0.2.0b110
