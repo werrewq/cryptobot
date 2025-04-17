@@ -100,9 +100,9 @@ class SecuredConfig(EnvironmentVariables):
         key = self.__environment_variables.get_broker_api_key()
         return self.__decrypter.decrypt(key)
 
-    def get_broker_secret_key(self) -> str:
-        key = self.__environment_variables.get_broker_secret_key()
-        return self.__decrypter.decrypt(key)
+    # def get_broker_secret_key(self) -> str:
+    #     key = self.__environment_variables.get_broker_secret_key()
+    #     return self.__decrypter.decrypt(key)
 
     def get_telegram_bot_api_token(self) -> str:
         key = self.__environment_variables.get_telegram_bot_api_token()
@@ -114,3 +114,6 @@ class SecuredConfig(EnvironmentVariables):
 
     def get_chat_pass(self):
         return self.__environment_variables.get_chat_pass()
+
+    def get_broker_account_id(self):
+        raise Exception("Доделай конфиг")
