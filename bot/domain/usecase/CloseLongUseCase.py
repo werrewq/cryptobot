@@ -19,3 +19,4 @@ class CloseLongUseCase:
         if self.broker_api.have_order_long(trade_intent.trading_config):
             self.broker_api.close_long_position(trade_intent.trading_config)
             self.messenger_api.send_message("#Закрываем Long ✅")
+            # TODO Дождаться закрытия

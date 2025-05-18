@@ -3,16 +3,15 @@ from dependency_injector import containers, providers
 from bot.config.Decrypter import Decrypter
 from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
-from bot.data.api.BybitApi import BybitApi
 from bot.data.api.BybitErrorHandler import BybitErrorHandler
-from bot.data.api.BybitInteractor import BybitInteractor
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
+from bot.data.api.tinkoff_api.TinkoffApiProvider import TinkoffApiProvider
+from bot.data.api.tinkoff_api.TinkoffInteractor import TinkoffInteractor
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor
-from bot.domain.dto.TradeIntent import TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
@@ -87,18 +86,13 @@ class ApplicationContainer(containers.DeclarativeContainer):
         trading_config = trading_config,
     )
 
-    bybit_api: BybitApi = providers.Singleton(
-        BybitApi,
-        trading_config=trading_config,
-        secured_config=secured_config,
-    )
+    tinkoff_api = TinkoffApiProvider(trading_config= trading_config, secured_config=secured_config)
 
     broker_api: BrokerApi = providers.Singleton(
-        BybitInteractor,
-        bybit_api = bybit_api,
-        retry_request_fabric=retry_request_handler_fabric,
+        TinkoffInteractor,
+        tinkoff_api = tinkoff_api,
+        secured_config= secured_config,
         trading_config = trading_config,
-        trading_logger = trading_logger,
     )
 
     close_short_usecase = providers.Factory(

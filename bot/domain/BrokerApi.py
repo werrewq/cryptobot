@@ -23,11 +23,11 @@ class BrokerApi:
         pass
 
     @abc.abstractmethod
-    def close_short_position(self, trading_config: TradingConfig):
+    def close_short_position(self, trading_config: TradingConfig) -> str:
         pass
 
     @abc.abstractmethod
-    def close_long_position(self, trading_config: TradingConfig):
+    def close_long_position(self, trading_config: TradingConfig) -> str:
         pass
 
     @abc.abstractmethod

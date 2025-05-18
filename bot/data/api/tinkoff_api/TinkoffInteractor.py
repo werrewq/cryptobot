@@ -1,10 +1,10 @@
 from tinkoff.invest import OrderDirection, InstrumentType, StopOrderDirection
 
-from bot.config.TinkoffSecuredConfig import TinkoffSecuredConfig
+from bot.config.SecuredConfig import SecuredConfig
 from bot.data.api.tinkoff_api.Helpers import float_to_quotation
 from bot.data.api.tinkoff_api.TinkoffApi import TinkoffApi
 from bot.domain.BrokerApi import BrokerApi
-from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent
+from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 INSTRUMENT_TYPE = InstrumentType.INSTRUMENT_TYPE_SHARE # TODO вывести в трейдинг конфиг закрыв абстракцией от внутрянки тинька
@@ -14,11 +14,13 @@ class TinkoffInteractor(BrokerApi):
     __tinkoff_api: TinkoffApi
     __account_id: str
     __instrument_figi: str
+    __trading_config: TradingConfig
 
-    def __init__(self, tinkoff_api: TinkoffApi, secured_config: TinkoffSecuredConfig, trading_config: TradingConfig):
+    def __init__(self, tinkoff_api: TinkoffApi, secured_config: SecuredConfig, trading_config: TradingConfig):
         self.__tinkoff_api = tinkoff_api
         self.__account_id = secured_config.get_broker_account_id()
-        self.__instrument_figi = self.get_figi(ticker=trading_config.target_coin_name, instrument_type=INSTRUMENT_TYPE)
+        self.__instrument_figi = self.get_figi(ticker=trading_config.target_share_name, instrument_type=INSTRUMENT_TYPE)
+        self.__trading_config = trading_config
 
     def have_order_long(self, trading_config: TradingConfig) -> bool:
         return self.__has_position(direction=OrderDirection.ORDER_DIRECTION_BUY)
@@ -66,7 +68,9 @@ class TinkoffInteractor(BrokerApi):
             account_id=self.__account_id,
             direction=direction
         )
-        return str(resp)
+        balance = self.get_balance()
+        order_message = f'''Тип сделки: Market\nБумага: {self.__trading_config.target_share_name}\nНаправление: {str(direction)}\n Количество: {str(resp.total_order_amount)}\n Цена выполнения: {str(resp.executed_order_price)}\n Баланс на кошельке: {str(balance)}'''
+        return order_message
 
     def get_balance(self):
         account_positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
@@ -82,7 +86,7 @@ class TinkoffInteractor(BrokerApi):
                 return asset.balance
         raise Exception("Не было найдено никаких ценных бумаг на аккаунте")
 
-    def close_short_position(self, trading_config: TradingConfig):
+    def close_short_position(self, trading_config: TradingConfig) -> str:
         # Получаем портфель
         positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
         quantity_to_sell = None
@@ -96,7 +100,7 @@ class TinkoffInteractor(BrokerApi):
         # Отправляем рыночный ордер на продажу такого же количества в противоположную сторону
         return self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_BUY, quantity=quantity_to_sell, figi=self.__instrument_figi)
 
-    def close_long_position(self, trading_config: TradingConfig):
+    def close_long_position(self, trading_config: TradingConfig) -> str:
         # Получаем портфель
         positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
         quantity_to_sell = None
@@ -148,15 +152,16 @@ class TinkoffInteractor(BrokerApi):
         return f"Стоп лосс успешно установлен на цене {str(StopLossIntent.trigger_price)}"
 
     # TODO проверить на бою
-    def set_take_profit(self, stop_loss_intent: StopLossIntent) -> str: # TODO StopLossIntent -> TakeProfitIntent
+    def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
+
+        # TODO логика для market и procent
         orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
         for order in orders.stop_orders:
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
-
         direction = None
-        if self.have_order_long(stop_loss_intent.trading_config):
+        if self.have_order_long(take_profit_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_SELL
-        elif self.have_order_short(stop_loss_intent.trading_config):
+        elif self.have_order_short(take_profit_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_BUY
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")

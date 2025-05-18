@@ -1,20 +1,18 @@
-from bot.config.TinkoffSecuredConfig import TinkoffSecuredConfig
+from bot.config.Decrypter import Decrypter
+from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.tinkoff_api.TinkoffInteractor import TinkoffInteractor
 from bot.data.api.tinkoff_api.TinkoffSandboxApi import TinkoffSandboxApi
-from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.BotLogger import BotLogger
 
 loger = BotLogger()
 loger.run()
 trading_config: TradingConfig = TradingConfigProvider().provide(test=True)
-
-# retry_request_handler_fabric = RetryRequestHandlerFabric(MessengerApiMock())
-# decrypter = Decrypter(b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd')
-# bybit_api = BybitApi(trading_config, SecuredConfig(trading_config, decrypter = decrypter))
-
-secured_config=TinkoffSecuredConfig()
+decrypter = Decrypter(b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd')
+secured_config=SecuredConfig(trading_config=trading_config,decrypter=decrypter)
+# tinkoff_api = TinkoffRealApi(secured_config=secured_config)
 tinkoff_api = TinkoffSandboxApi(secured_config=secured_config)
 tinkoff_interactor = TinkoffInteractor(tinkoff_api=tinkoff_api, secured_config=secured_config, trading_config=trading_config)
 
@@ -51,7 +49,7 @@ def cancel_all_orders():
     tinkoff_interactor.cancel_all_active_orders(trading_config)
 
 def set_take_profit():
-    intent = StopLossIntent(trading_config, side="Sell", trigger_price=3200)
+    intent = TakeProfitIntent(trading_config, side="Sell", trigger_price=3200)
     tinkoff_interactor.set_take_profit(intent)
 
 if __name__ == '__main__':

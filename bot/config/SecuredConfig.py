@@ -24,8 +24,8 @@ test_broker_secret_key = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
 # test_broker_secret_key 3EEwQjfzXwyOh72bHjQEB7prHQEBODIk044E
 
 # ENCRYPTED TEST DATA:
-test_broker_api_key="XOw+/iFqNt9uIg2Xb4aHWhGJgaVBQZNdbsjDE1osaGHn3Q=="
-test_broker_secret_key="z41bJjQ/fdSRRSN9dDjEqP/X8h8UVwW26n4OYWtN0h3E/rOQ+j0jAo/AvfhdDCg2vcj8iQ=="
+test_broker_api_key=""
+broker_account_id=""
 test_telegram_bot_api_token="nkehNJmDNtREwe9bD7fCMED0UrLitJc8kMrcHtxUYmJ7Ky7vMSLwY68t3P4Js991xG67qXPskQvi51MjGA0="
 test_cryptobot_api_token="ZneAYlbPyFn7YSHGNbMhbTi2doRmuMjwptnsMfudU1ekO1u2LwnwBP0acyGR/6moUaR6dXFS3mRMbXsoN1/DeXE3G5Ygat9lSWb7O3KkgSk="
 
@@ -36,7 +36,7 @@ class EnvironmentVariables:
         pass
 
     @abc.abstractmethod
-    def get_broker_secret_key(self) -> str:
+    def get_broker_account_id(self) -> str:
         pass
 
     @abc.abstractmethod
@@ -53,14 +53,14 @@ class EnvironmentVariables:
 
 class TestEnvironmentVariables(EnvironmentVariables):
 
+    def get_broker_account_id(self) -> str:
+        return broker_account_id
+
     def get_chat_pass(self) -> str:
         return test_chat_pass
 
     def get_broker_api_key(self) -> str:
         return test_broker_api_key
-
-    def get_broker_secret_key(self) -> str:
-        return test_broker_secret_key
 
     def get_telegram_bot_api_token(self) -> str:
         return test_telegram_bot_api_token
@@ -70,14 +70,14 @@ class TestEnvironmentVariables(EnvironmentVariables):
 
 class OsEnvironmentVariables(EnvironmentVariables):
 
+    def get_broker_account_id(self) -> str:
+        return os.environ["BROKER_ACCOUNT_ID"]
+
     def get_chat_pass(self) -> str:
         return os.environ["CHAT_PASS"]
 
     def get_broker_api_key(self) -> str:
         return os.environ["BROKER_API_KEY"]
-
-    def get_broker_secret_key(self) -> str:
-        return os.environ["BROKER_SECRET_KEY"]
 
     def get_telegram_bot_api_token(self) -> str:
         return os.environ["TELEGRAM_BOT_API_TOKEN"]
@@ -100,10 +100,6 @@ class SecuredConfig(EnvironmentVariables):
         key = self.__environment_variables.get_broker_api_key()
         return self.__decrypter.decrypt(key)
 
-    # def get_broker_secret_key(self) -> str:
-    #     key = self.__environment_variables.get_broker_secret_key()
-    #     return self.__decrypter.decrypt(key)
-
     def get_telegram_bot_api_token(self) -> str:
         key = self.__environment_variables.get_telegram_bot_api_token()
         return self.__decrypter.decrypt(key)
@@ -116,4 +112,4 @@ class SecuredConfig(EnvironmentVariables):
         return self.__environment_variables.get_chat_pass()
 
     def get_broker_account_id(self):
-        raise Exception("Доделай конфиг")
+        raise self.__environment_variables.get_broker_account_id()

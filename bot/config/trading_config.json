@@ -1,9 +1,9 @@
 {
   "order_volume_percent_of_capital": 100,
-  "target_coin_name": "T",
+  "target_share_name": "T",
   "asset_name": "rub",
   "leverage": 1,
   "testnet": false,
   "test_env_vars": false,
-  "demo": true
+  "sandbox": true
 }

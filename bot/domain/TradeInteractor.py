@@ -31,7 +31,7 @@ class TradeInteractor:
         self.__set_take_profit_usecase = set_take_profit_usecase
 
     def start_trade(self, trade_intent: TradeIntent):
-        self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
+        self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_share_name)
         trading_status = self.__trading_status_interactor.get_trading_status()
         if trading_status == TradingStatus.OFFLINE:
             logging.debug("set_trading_status == " + str(trading_status.value))
