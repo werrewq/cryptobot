@@ -1,6 +1,6 @@
 import abc
 
-from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, StopLossIntent
+from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 
@@ -36,4 +36,8 @@ class BrokerApi:
 
     @abc.abstractmethod
     def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
+        pass
+
+    @abc.abstractmethod
+    def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
         pass

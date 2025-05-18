@@ -145,3 +145,17 @@ class BybitApi:
         )
         return r
 
+    def set_take_profit(self, pair_name, side, trigger_direction, trigger_price, qty):
+        r = self.__client.place_order(
+            category=MARKET_CATEGORY,
+            symbol=pair_name,
+            side=side,
+            orderType="Market",
+            time_in_force="GoodTillCancel",
+            qty=qty,
+            triggerPrice=floor_price(trigger_price, self.__coin_pair_info),
+            triggerDirection=trigger_direction,
+        )
+        return r
+
+

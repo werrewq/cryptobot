@@ -5,7 +5,7 @@ from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.BybitApi import BybitApi
 from bot.data.api.BybitInteractor import BybitInteractor
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
-from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
@@ -57,6 +57,10 @@ def get_filters():
 def set_stop_loss():
     intent = StopLossIntent(trading_config, side= "Sell", trigger_price=115)
     api.set_stop_loss(intent)
+
+def set_take_profit():
+    intent = TakeProfitIntent(trading_config, side= "Buy", trigger_price=115, take_profit_percentage_from_order=25, market=False)
+    api.set_take_profit(intent)
 
 def cancel_all_orders():
     api.cancel_all_active_orders(trading_config)

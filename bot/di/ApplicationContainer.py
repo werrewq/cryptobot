@@ -12,12 +12,14 @@ from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor
+from bot.domain.dto.TradeIntent import TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
 from bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
 from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
 from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
+from bot.domain.usecase.SetTakeProfitUseCase import SetTakeProfitUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
@@ -124,6 +126,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     set_stop_loss_usecase = providers.Factory(
         SetStopLossUseCase,
+        broker_api = broker_api,
+        messenger_api = messenger_api
+    )
+
+    set_take_profit_usecase = providers.Factory(
+        SetTakeProfitUseCase,
         broker_api = broker_api,
         messenger_api = messenger_api
     )

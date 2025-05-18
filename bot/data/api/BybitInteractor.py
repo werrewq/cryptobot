@@ -8,12 +8,13 @@ from bot.data.api.BybitApi import BybitApi
 from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.domain.BrokerApi import BrokerApi
-from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent
+from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.TradingLogger import RawTradingLog, TradingLogger
 
 
 class BybitInteractor(BrokerApi):
+
     __bybit_api: BybitApi
     __retry_request_fabric: RetryRequestHandlerFabric
     __coin_pair_info: CoinPairInfo
@@ -197,5 +198,63 @@ class BybitInteractor(BrokerApi):
 
         r = self.__bybit_api.set_stop_loss(pair_name, stop_loss_intent.side, trigger_direction, trigger_price)
         logging.debug(f"Set Stop Loss: {str(r)}")
-        message = f'''Установлен STOP LOSS:\nТип сделки: Market\nВалюта: {pair_name}\nНаправление: {stop_loss_intent.side}\nУровень активации: {trigger_price} USDT\n'''
+        message = f'''Установлен STOP LOSS:\nВалюта: {pair_name}\nНаправление: {stop_loss_intent.side}\nУровень активации: {trigger_price} USDT\n'''
         return message
+
+    def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__set_take_profit(take_profit_intent))
+
+    def __set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
+        if take_profit_intent.market:
+            return self.__set_market_take_profit(take_profit_intent)
+
+        config: TradingConfig = take_profit_intent.trading_config
+        pair_name = config.target_coin_name + config.asset_name
+        trigger_price = take_profit_intent.trigger_price
+        curr_price = self.get_price(pair_name)
+        trigger_direction = 1 if trigger_price < curr_price else 2
+
+        target_coin_qty_in_position = self.__get_target_coin_qty_in_position(take_profit_intent)
+        qty = target_coin_qty_in_position / 100 * take_profit_intent.take_profit_percentage_from_order
+        qty = floor_qty(qty, self.__coin_pair_info)
+        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
+
+
+        r = self.__bybit_api.set_take_profit(pair_name, take_profit_intent.side, trigger_direction, trigger_price, qty)
+        logging.debug(f"Set Take profit: {str(r)}")
+        message = f'''Установлен TAKE PROFIT:\nТип сделки: Market\nВалюта: {pair_name}\nНаправление: {take_profit_intent.side}\nУровень активации: {trigger_price} USDT\n'''
+        return message
+
+    def __set_market_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
+
+        target_coin_qty_in_position = self.__get_target_coin_qty_in_position(take_profit_intent)
+        qty = target_coin_qty_in_position / 100 * take_profit_intent.take_profit_percentage_from_order
+        qty = floor_qty(qty, self.__coin_pair_info)
+        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
+
+        pair_name = take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name
+
+        order_message = f'''Тип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
+        result = self.__bybit_api.place_order(
+            coin_name = pair_name,
+            side=take_profit_intent.side,
+            qty=qty,
+            order_message=order_message,
+        )
+        log = RawTradingLog(
+            coin_name=pair_name,
+            side=side,
+            leverage=str(trading_config.leverage),
+            coin_price=str(curr_price),
+            qty=qty,
+            asset_name=asset_name,
+            available_assets=str(available_assets),
+        )
+        self.__trading_logger.trade_log(log)
+
+        message = f'''Забираем TAKE PROFIT по Маркету :\nТип сделки: Market\nВалюта: {pair_name}'''
+        return message
+
+    def __get_target_coin_qty_in_position(self, take_profit_intent):
+        pass

@@ -18,3 +18,9 @@ class ShortIntent(TradeIntent):
 @dataclass
 class StopLossIntent(TradeIntent):
     trigger_price: float
+
+@dataclass
+class TakeProfitIntent(TradeIntent):
+    trigger_price: float
+    take_profit_percentage_from_order: int
+    market: bool

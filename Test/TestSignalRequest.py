@@ -58,6 +58,35 @@ def set_stop_loss(stop_price: float, side: str):
     print("Response status code:", response.status_code)
     print("Response JSON:", str(response.json()))
 
+def set_take_profit(stop_price: float, side: str, take_profit_percentage: int):
+    print("--------STOP LOSS TEST--------")
+    data = json.dumps({
+        "signal": "take_profit",
+        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "side": side,
+        "trigger_price": str(stop_price),
+        "take_profit_percentage": str(take_profit_percentage),
+    })
+    response = requests.post(url + "/position", json=data, headers= headers)
+    print("Response: " + response.text)
+    print("Response status code:", response.status_code)
+    print("Response JSON:", str(response.json()))
+
+def set_take_profit_market(stop_price: float, side: str, take_profit_percentage: int):
+    print("--------STOP LOSS TEST--------")
+    data = json.dumps({
+        "signal": "take_profit",
+        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "side": side,
+        "trigger_price": str(stop_price),
+        "take_profit_percentage": str(take_profit_percentage),
+        "market": True
+    })
+    response = requests.post(url + "/position", json=data, headers= headers)
+    print("Response: " + response.text)
+    print("Response status code:", response.status_code)
+    print("Response JSON:", str(response.json()))
+
 def download_logs():
     print("--------DOWNLOAD_LOGS--------")
     data = json.dumps({

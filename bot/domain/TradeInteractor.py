@@ -2,10 +2,8 @@ import logging
 
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor, TradingStatus
-from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent
-from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase
-
-
+from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent, TakeProfitIntent
+from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase, SetTakeProfitUseCase
 
 
 class TradeInteractor:
@@ -14,12 +12,14 @@ class TradeInteractor:
     __messenger: MessengerApi
     __set_stop_loss_usecase: SetStopLossUseCase
     __trading_status_interactor: TradingStatusInteractor
+    __set_take_profit_usecase: SetTakeProfitUseCase
 
     def __init__(
             self,
             open_long_usecase,
             open_short_usecase,
             set_stop_loss_usecase,
+            take_profit_usecase,
             messenger_api: MessengerApi,
             trading_status_interactor: TradingStatusInteractor,
     ):
@@ -28,6 +28,7 @@ class TradeInteractor:
         self.__messenger = messenger_api
         self.__set_stop_loss_usecase = set_stop_loss_usecase
         self.__trading_status_interactor = trading_status_interactor
+        self.__set_take_profit_usecase = take_profit_usecase
 
     def start_trade(self, trade_intent: TradeIntent):
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)
@@ -46,6 +47,9 @@ class TradeInteractor:
 
             case StopLossIntent():
                 self.__set_stop_loss_usecase.run(trade_intent)
+
+            case TakeProfitIntent():
+                self.__set_take_profit_usecase.run(trade_intent)
 
             case _:
                 raise TypeError('Unsupported type')
