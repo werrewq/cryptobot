@@ -141,6 +141,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         open_long_usecase = open_long_usecase,
         open_short_usecase = open_short_usecase,
         set_stop_loss_usecase = set_stop_loss_usecase,
+        set_take_profit_usecase = set_take_profit_usecase,
         messenger_api = messenger_api,
         trading_status_interactor = trading_status_interactor
     )

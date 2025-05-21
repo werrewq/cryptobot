@@ -19,7 +19,7 @@ class TradeInteractor:
             open_long_usecase,
             open_short_usecase,
             set_stop_loss_usecase,
-            take_profit_usecase,
+            set_take_profit_usecase,
             messenger_api: MessengerApi,
             trading_status_interactor: TradingStatusInteractor,
     ):
@@ -28,7 +28,7 @@ class TradeInteractor:
         self.__messenger = messenger_api
         self.__set_stop_loss_usecase = set_stop_loss_usecase
         self.__trading_status_interactor = trading_status_interactor
-        self.__set_take_profit_usecase = take_profit_usecase
+        self.__set_take_profit_usecase = set_take_profit_usecase
 
     def start_trade(self, trade_intent: TradeIntent):
         self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_coin_name)

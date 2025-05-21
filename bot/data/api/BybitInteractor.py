@@ -214,12 +214,7 @@ class BybitInteractor(BrokerApi):
         trigger_price = take_profit_intent.trigger_price
         curr_price = self.get_price(pair_name)
         trigger_direction = 1 if trigger_price < curr_price else 2
-
-        target_coin_qty_in_position = self.__get_target_coin_qty_in_position(take_profit_intent)
-        qty = target_coin_qty_in_position / 100 * take_profit_intent.take_profit_percentage_from_order
-        qty = floor_qty(qty, self.__coin_pair_info)
-        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
-
+        qty = self.__count_take_profit_qty(take_profit_intent)
 
         r = self.__bybit_api.set_take_profit(pair_name, take_profit_intent.side, trigger_direction, trigger_price, qty)
         logging.debug(f"Set Take profit: {str(r)}")
@@ -227,34 +222,35 @@ class BybitInteractor(BrokerApi):
         return message
 
     def __set_market_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
-
-        target_coin_qty_in_position = self.__get_target_coin_qty_in_position(take_profit_intent)
-        qty = target_coin_qty_in_position / 100 * take_profit_intent.take_profit_percentage_from_order
-        qty = floor_qty(qty, self.__coin_pair_info)
-        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
-
+        qty = self.__count_take_profit_qty(take_profit_intent)
         pair_name = take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name
+        curr_price = self.get_price(pair_name)
+        available_assets = self.get_assets(take_profit_intent.trading_config.asset_name)
 
-        order_message = f'''Тип сделки: Market\nВалюта: {coin_name}\nНаправление: {side}\nПлечо: {trading_config.leverage}\nКоличество: {qty} {trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {asset_name}'''
-        result = self.__bybit_api.place_order(
+        order_message = f'''Тип сделки: Market\nВалюта: {pair_name}\nНаправление: {take_profit_intent.side}\nПлечо: {take_profit_intent.trading_config.leverage}\nКоличество: {qty} {take_profit_intent.trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {take_profit_intent.trading_config.asset_name}'''
+        self.__bybit_api.place_order(
             coin_name = pair_name,
             side=take_profit_intent.side,
-            qty=qty,
+            order_value=qty,
             order_message=order_message,
         )
         log = RawTradingLog(
             coin_name=pair_name,
-            side=side,
-            leverage=str(trading_config.leverage),
+            side=take_profit_intent.side,
+            leverage=str(take_profit_intent.trading_config.leverage),
             coin_price=str(curr_price),
-            qty=qty,
-            asset_name=asset_name,
+            qty=str(qty),
+            asset_name=take_profit_intent.trading_config.asset_name,
             available_assets=str(available_assets),
         )
         self.__trading_logger.trade_log(log)
 
-        message = f'''Забираем TAKE PROFIT по Маркету :\nТип сделки: Market\nВалюта: {pair_name}'''
+        message = f'''Забираем TAKE PROFIT по Маркету :\n''' + order_message
         return message
 
-    def __get_target_coin_qty_in_position(self, take_profit_intent):
-        pass
+    def __count_take_profit_qty(self, take_profit_intent) -> float:
+        full_position_qty = self.get_assets(take_profit_intent.trading_config.target_coin_name)
+        qty = full_position_qty / 100 * take_profit_intent.take_profit_percentage_from_order
+        qty = floor_qty(qty, self.__coin_pair_info)
+        if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
+        return qty
