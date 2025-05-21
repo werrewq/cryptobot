@@ -279,7 +279,7 @@ class BybitInteractor(BrokerApi):
         positions = json['result']
         for position in positions['list']:
             if position['symbol'] == symbol:
-                full_position_qty = float(position['positionValue'])
+                full_position_qty = float(position['size'])
 
         logging.debug(f"full_position_qty = {str(full_position_qty)}")
         logging.debug(f"take_profit_percentage_from_order = {str(take_profit_intent.take_profit_percentage_from_order)}")
