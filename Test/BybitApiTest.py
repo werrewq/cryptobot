@@ -44,7 +44,7 @@ def close_short_position():
     api.close_short_position(trading_config)
 
 def get_assets():
-    print(str(api.get_assets(trading_config.asset_name)))
+    print(str(api.get_total_available_balance(trading_config.asset_name)))
 
 def place_buy_order():
     intent = LongIntent(trading_config, side="buy")

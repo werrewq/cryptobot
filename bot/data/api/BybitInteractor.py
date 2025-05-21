@@ -67,11 +67,11 @@ class BybitInteractor(BrokerApi):
         logging.debug(f"current price {pair} = {str(r)}")
         return r
 
-    def get_assets(self, coin_name) -> float:
+    def get_total_available_balance(self, asset_name) -> float:
         """
-        Получаю остатки на аккаунте по конкретной монете
+        Получаю остатки на аккаунте по активам: пример USDT
         """
-        r = self.__bybit_api.get_wallet_balance(coin_name)
+        r = self.__bybit_api.get_wallet_balance(asset_name)
         print(str(r))
         wallet_balance = None
         result = r['result']
@@ -82,6 +82,20 @@ class BybitInteractor(BrokerApi):
             return float(wallet_balance)
         else:
             return 0.0
+
+    def get_target_coin_balance(self, target_coin_name) -> float:
+        """
+        Получаю остатки на аккаунте по конкретной монете
+        """
+        r = self.__bybit_api.get_wallet_balance(target_coin_name)
+        print(str(r))
+        result = r['result']
+        wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
+        coins = wallet['coin']
+        for coin in coins:
+            if coin['coin'] == target_coin_name:
+                return float(coin['walletBalance'])
+        return 0.0
 
     def have_order_long(self, trading_config: TradingConfig) -> bool:
         return self.__have_order(trading_config, PositionType.LONG)
@@ -147,7 +161,7 @@ class BybitInteractor(BrokerApi):
         имеет смысл только для контрактов
         (для спота есть аргумент marketUnit, см. https://youtu.be/e7Np2ICYBzg )
         """
-        available_assets = self.get_assets(asset_name)
+        available_assets = self.get_total_available_balance(asset_name)
         curr_price = self.get_price(trading_config.target_coin_name + trading_config.asset_name)
         if asset_name == trading_config.target_coin_name: # продаем целевую валюту, для linear ордер считаем в ней
             assets_for_order = available_assets
@@ -232,7 +246,7 @@ class BybitInteractor(BrokerApi):
         qty = self.__count_take_profit_qty(take_profit_intent)
         pair_name = take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name
         curr_price = self.get_price(pair_name)
-        available_assets = self.get_assets(take_profit_intent.trading_config.asset_name)
+        available_assets = self.get_total_available_balance(take_profit_intent.trading_config.asset_name)
 
         order_message = f'''Тип сделки: Market\nВалюта: {pair_name}\nНаправление: {take_profit_intent.side}\nПлечо: {take_profit_intent.trading_config.leverage}\nКоличество: {qty} {take_profit_intent.trading_config.target_coin_name}\nРыночная цена: {curr_price} USDT\nНа кошельке: {available_assets} {take_profit_intent.trading_config.asset_name}'''
         self.__bybit_api.place_order(
@@ -256,8 +270,9 @@ class BybitInteractor(BrokerApi):
         return message
 
     def __count_take_profit_qty(self, take_profit_intent) -> float:
-        full_position_qty = self.get_assets(take_profit_intent.trading_config.target_coin_name)
+        full_position_qty = self.get_target_coin_balance(take_profit_intent.trading_config.target_coin_name)
         logging.debug(f"full_position_qty = {str(full_position_qty)}")
+        logging.debug(f"take_profit_percentage_from_order = {str(take_profit_intent.take_profit_percentage_from_order)}")
         qty = full_position_qty / 100 * take_profit_intent.take_profit_percentage_from_order
         logging.debug(f"qty = {str(qty)}")
         qty = floor_qty(qty, self.__coin_pair_info)
