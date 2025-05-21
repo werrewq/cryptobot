@@ -65,7 +65,7 @@ def set_take_profit(stop_price: float, side: str, take_profit_percentage: int):
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "trigger_price": str(stop_price),
-        "take_profit_percentage": str(take_profit_percentage),
+        "take_profit_percentage_from_order": str(take_profit_percentage),
     })
     response = requests.post(url + "/position", json=data, headers= headers)
     print("Response: " + response.text)
@@ -79,7 +79,7 @@ def set_take_profit_market(stop_price: float, side: str, take_profit_percentage:
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "trigger_price": str(stop_price),
-        "take_profit_percentage": str(take_profit_percentage),
+        "take_profit_percentage_from_order": str(take_profit_percentage),
         "market": True
     })
     response = requests.post(url + "/position", json=data, headers= headers)
