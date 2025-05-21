@@ -90,10 +90,12 @@ class BybitInteractor(BrokerApi):
         r = self.__bybit_api.get_wallet_balance(target_coin_name)
         print(str(r))
         result = r['result']
+        logging.debug(f"result = {str(result)}")
         wallet = result['list'][0] #TODO может быть проблема, когда несколько кошельков
         coins = wallet['coin']
         for coin in coins:
             if coin['coin'] == target_coin_name:
+                logging.debug(f"walletBalance = {coin['walletBalance']}")
                 return float(coin['walletBalance'])
         return 0.0
 
