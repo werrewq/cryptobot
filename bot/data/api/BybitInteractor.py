@@ -193,8 +193,11 @@ class BybitInteractor(BrokerApi):
         config: TradingConfig = stop_loss_intent.trading_config
         pair_name = config.target_coin_name + config.asset_name
         trigger_price = stop_loss_intent.trigger_price
-        curr_price = self.get_price(pair_name)
-        trigger_direction = 1 if trigger_price > curr_price else 2
+
+        if stop_loss_intent.side == "Sell":
+            trigger_direction = 2 # Fall to price
+        else:
+            trigger_direction = 1 # Raise to price
 
         r = self.__bybit_api.set_stop_loss(pair_name, stop_loss_intent.side, trigger_direction, floor_qty(trigger_price, self.__coin_pair_info))
         logging.debug(f"Set Stop Loss: {str(r)}")
@@ -212,8 +215,12 @@ class BybitInteractor(BrokerApi):
         config: TradingConfig = take_profit_intent.trading_config
         pair_name = config.target_coin_name + config.asset_name
         trigger_price = take_profit_intent.trigger_price
-        curr_price = self.get_price(pair_name)
-        trigger_direction = 1 if trigger_price < curr_price else 2
+
+        if take_profit_intent.side == "Sell":
+            trigger_direction = 1 # Raise to price
+        else:
+            trigger_direction = 2  # Fall to price
+
         qty = self.__count_take_profit_qty(take_profit_intent)
 
         r = self.__bybit_api.set_take_profit(pair_name, take_profit_intent.side, trigger_direction, floor_qty(trigger_price,self.__coin_pair_info), qty)
