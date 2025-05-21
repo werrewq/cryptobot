@@ -3,8 +3,6 @@ import logging
 from pybit.unified_trading import HTTP
 
 from bot.config.SecuredConfig import SecuredConfig
-from bot.data.api.ApiHelpers import floor_qty, floor_price
-from bot.data.api.CoinPairInfo import CoinPairInfo
 from bot.domain.dto.TradingConfig import TradingConfig
 
 MARKET_CATEGORY = "linear"
@@ -12,7 +10,6 @@ MARKET_CATEGORY = "linear"
 class BybitApi:
 
     __client: HTTP
-    __coin_pair_info: CoinPairInfo
 
     def __init__(
             self,
@@ -140,7 +137,7 @@ class BybitApi:
             qty=0.0,
             reduceOnly=True,
             closeOnTrigger=True,
-            triggerPrice=floor_price(trigger_price, self.__coin_pair_info),
+            triggerPrice=trigger_price,
             triggerDirection=trigger_direction,
         )
         return r
@@ -153,7 +150,7 @@ class BybitApi:
             orderType="Market",
             time_in_force="GoodTillCancel",
             qty=qty,
-            triggerPrice=floor_price(trigger_price, self.__coin_pair_info),
+            triggerPrice=trigger_price,
             triggerDirection=trigger_direction,
         )
         return r

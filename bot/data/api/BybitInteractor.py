@@ -196,7 +196,7 @@ class BybitInteractor(BrokerApi):
         curr_price = self.get_price(pair_name)
         trigger_direction = 1 if trigger_price > curr_price else 2
 
-        r = self.__bybit_api.set_stop_loss(pair_name, stop_loss_intent.side, trigger_direction, trigger_price)
+        r = self.__bybit_api.set_stop_loss(pair_name, stop_loss_intent.side, trigger_direction, floor_qty(trigger_price, self.__coin_pair_info))
         logging.debug(f"Set Stop Loss: {str(r)}")
         message = f'''Установлен STOP LOSS:\nВалюта: {pair_name}\nНаправление: {stop_loss_intent.side}\nУровень активации: {trigger_price} USDT\n'''
         return message
@@ -216,7 +216,7 @@ class BybitInteractor(BrokerApi):
         trigger_direction = 1 if trigger_price < curr_price else 2
         qty = self.__count_take_profit_qty(take_profit_intent)
 
-        r = self.__bybit_api.set_take_profit(pair_name, take_profit_intent.side, trigger_direction, trigger_price, qty)
+        r = self.__bybit_api.set_take_profit(pair_name, take_profit_intent.side, trigger_direction, floor_qty(trigger_price,self.__coin_pair_info), qty)
         logging.debug(f"Set Take profit: {str(r)}")
         message = f'''Установлен TAKE PROFIT:\nТип сделки: Market\nВалюта: {pair_name}\nНаправление: {take_profit_intent.side}\nУровень активации: {trigger_price} USDT\n'''
         return message

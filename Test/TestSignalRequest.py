@@ -59,7 +59,7 @@ def set_stop_loss(stop_price: float, side: str):
     print("Response JSON:", str(response.json()))
 
 def set_take_profit(stop_price: float, side: str, take_profit_percentage: int):
-    print("--------STOP LOSS TEST--------")
+    print("--------TAKE_PROFIT_TEST--------")
     data = json.dumps({
         "signal": "take_profit",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
