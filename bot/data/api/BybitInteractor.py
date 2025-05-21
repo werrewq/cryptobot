@@ -257,7 +257,10 @@ class BybitInteractor(BrokerApi):
 
     def __count_take_profit_qty(self, take_profit_intent) -> float:
         full_position_qty = self.get_assets(take_profit_intent.trading_config.target_coin_name)
+        logging.debug(f"full_position_qty = {str(full_position_qty)}")
         qty = full_position_qty / 100 * take_profit_intent.take_profit_percentage_from_order
+        logging.debug(f"qty = {str(qty)}")
         qty = floor_qty(qty, self.__coin_pair_info)
+        logging.debug(f"floor qty = {str(qty)}")
         if qty < self.__coin_pair_info.min_qty: raise Exception(f"{qty} is to small")
         return qty

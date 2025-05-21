@@ -26,8 +26,5 @@ class SignalToIntentMapper:
                     take_profit_percentage_from_order=take_profit_percentage,
                     market=market,
                     side=data["side"])
-            # strategy.entry("Long",true,when=entry_long)
-            # strategy.exit("TP/SL","Long", limit=long_take_level, stop=long_stop_level)
-            # strategy.close("Long", when=exit_long, comment="Exit")
             case _:
                 raise TypeError('Unsupported trade intent')
