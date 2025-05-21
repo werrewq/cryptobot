@@ -272,7 +272,7 @@ class BybitInteractor(BrokerApi):
         return message
 
     def __count_take_profit_qty(self, take_profit_intent) -> float:
-        full_position_qty = self.get_target_coin_balance(take_profit_intent.trading_config.target_coin_name)
+        full_position_qty = self.get_target_coin_balance(take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name)
         logging.debug(f"full_position_qty = {str(full_position_qty)}")
         logging.debug(f"take_profit_percentage_from_order = {str(take_profit_intent.take_profit_percentage_from_order)}")
         qty = full_position_qty / 100 * take_profit_intent.take_profit_percentage_from_order
