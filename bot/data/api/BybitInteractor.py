@@ -272,10 +272,18 @@ class BybitInteractor(BrokerApi):
         return message
 
     def __count_take_profit_qty(self, take_profit_intent) -> float:
-        full_position_qty = self.get_target_coin_balance(take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name)
+        symbol = take_profit_intent.trading_config.target_coin_name + take_profit_intent.trading_config.asset_name
+        json = self.__bybit_api.get_positions(take_profit_intent.trading_config)
+
+        full_position_qty = 0
+        positions = json['result']
+        for position in positions['list']:
+            if position['symbol'] == symbol:
+                full_position_qty = float(position['positionValue'])
+
         logging.debug(f"full_position_qty = {str(full_position_qty)}")
         logging.debug(f"take_profit_percentage_from_order = {str(take_profit_intent.take_profit_percentage_from_order)}")
-        qty = full_position_qty / 100 * take_profit_intent.take_profit_percentage_from_order
+        qty = abs(full_position_qty) / 100 * take_profit_intent.take_profit_percentage_from_order
         logging.debug(f"qty = {str(qty)}")
         qty = floor_qty(qty, self.__coin_pair_info)
         logging.debug(f"floor qty = {str(qty)}")
