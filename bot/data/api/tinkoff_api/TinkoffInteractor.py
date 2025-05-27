@@ -50,7 +50,8 @@ class TinkoffInteractor(BrokerApi):
     def place_sell_order(self, short_intent: ShortIntent) -> str:
         direction: OrderDirection = OrderDirection.ORDER_DIRECTION_SELL
         figi = self.__instrument_figi
-        quantity = self.get_max_market_lots().sell_margin_limits.sell_max_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        max_market_lots = self.get_max_market_lots()
+        quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
         return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
@@ -80,8 +81,8 @@ class TinkoffInteractor(BrokerApi):
     def get_target_asset_qty_on_account(self):
         account_positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
         for asset in account_positions.securities:
-            if asset.figi == MONEY_CURRENCY:
-                return asset.balance
+            if asset.figi == self.__instrument_figi:
+                return abs(asset.balance)
         raise Exception("Не было найдено никаких ценных бумаг на аккаунте")
 
     def close_short_position(self, trading_config: TradingConfig) -> str:
@@ -135,7 +136,7 @@ class TinkoffInteractor(BrokerApi):
             raise Exception("Не нашли figi инструмента на бирже")
         return figi
 
-    def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str: # TODO проверить на бою
+    def set_stop_loss(self, stop_loss_intent: StopLossIntent) -> str:
         orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
         for order in orders.stop_orders:
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
@@ -148,7 +149,7 @@ class TinkoffInteractor(BrokerApi):
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")
 
-        stop_price = float_to_quotation(StopLossIntent.trigger_price)
+        stop_price = float_to_quotation(stop_loss_intent.trigger_price)
 
         self.__tinkoff_api.post_stop_loss_order( # TODO нужно возвращать какой-то пруф от api
             figi=self.__instrument_figi,
@@ -157,9 +158,8 @@ class TinkoffInteractor(BrokerApi):
             stop_price=stop_price,
             account_id=self.__account_id,
         )
-        return f"Стоп лосс успешно установлен на цене {str(StopLossIntent.trigger_price)}"
+        return f"Стоп лосс успешно установлен на цене {str(stop_loss_intent.trigger_price)}"
 
-    # TODO проверить на бою
     def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
 
         orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
@@ -178,7 +178,7 @@ class TinkoffInteractor(BrokerApi):
         if take_profit_intent.market:
             return self.__set_market_take_profit(direction, qty_to_close)
 
-        stop_price = float_to_quotation(StopLossIntent.trigger_price)
+        stop_price = float_to_quotation(take_profit_intent.trigger_price)
 
         self.__tinkoff_api.post_take_profit_order(
             figi=self.__instrument_figi,
@@ -187,7 +187,7 @@ class TinkoffInteractor(BrokerApi):
             stop_price=stop_price,
             account_id=self.__account_id,
         )
-        return f"Take profit успешно установлен на цене {str(StopLossIntent.trigger_price)}"
+        return f"Take profit успешно установлен на цене {str(take_profit_intent.trigger_price)}"
 
     def __set_market_take_profit(self, direction, qty_to_close):
         if direction is StopOrderDirection.STOP_ORDER_DIRECTION_SELL:

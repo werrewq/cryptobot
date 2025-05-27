@@ -41,34 +41,42 @@ def place_buy_order():
     res = tinkoff_interactor.place_buy_order(intent)
     print(res)
 
-def set_stop_loss():
-    intent = StopLossIntent(trading_config, side= "Sell", trigger_price=3000)
+def set_stop_loss(trigger_price, side = "Sell"):
+    intent = StopLossIntent(trading_config, side= side, trigger_price=trigger_price)
     tinkoff_interactor.set_stop_loss(intent)
 
 def cancel_all_orders():
     tinkoff_interactor.cancel_all_active_orders(trading_config)
 
-def set_take_profit():
-    intent = TakeProfitIntent(trading_config, side="Sell", trigger_price=3200)
+def set_take_profit(trigger_price, side = "Sell", market = False, take_profit_percentage_from_order = 100):
+    intent = TakeProfitIntent(trading_config, side=side, trigger_price=trigger_price, take_profit_percentage_from_order=take_profit_percentage_from_order, market= market)
     tinkoff_interactor.set_take_profit(intent)
 
 if __name__ == '__main__':
-    if tinkoff_interactor.have_order_long(trading_config):
-        close_long_position()
-    if tinkoff_interactor.have_order_short(trading_config):
-        close_short_position()
-    place_buy_order()
-    res = tinkoff_api.get_positions(secured_config.get_broker_account_id())
-    print(str(res.securities))
-    close_long_position()
     place_sell_order()
-    res = tinkoff_api.get_positions(secured_config.get_broker_account_id())
-    print(str(res.securities))
+    set_stop_loss(trigger_price=100, side="Buy")
     close_short_position()
     place_buy_order()
-    res = tinkoff_api.get_positions(secured_config.get_broker_account_id())
-    print(str(res.securities))
     close_long_position()
-    place_sell_order()
-    res = tinkoff_api.get_positions(secured_config.get_broker_account_id())
-    print(str(res.securities))
+
+
+    # place_buy_order()
+    # set_stop_loss(trigger_price=80, side= "Sell")
+    # set_stop_loss(trigger_price=84, side="Sell")
+    # set_take_profit(trigger_price=100, side="Sell")
+    # set_take_profit(trigger_price=101, side="Sell")
+    # close_long_position()
+    # place_sell_order()
+    # set_stop_loss(trigger_price=100, side= "Buy")
+    # set_stop_loss(trigger_price=99, side="Buy")
+    # set_take_profit(trigger_price=84, side="Buy")
+    # set_take_profit(trigger_price=80, side="Buy")
+    # close_short_position()
+    # place_buy_order()
+    # set_take_profit(trigger_price=101, side="Sell", market=True, take_profit_percentage_from_order=25)
+    # set_take_profit(trigger_price=101, side="Sell", market=True, take_profit_percentage_from_order=25)
+    # close_long_position()
+    # place_sell_order()
+    # set_take_profit(trigger_price=101, side="Buy", market=True, take_profit_percentage_from_order=25)
+    # set_take_profit(trigger_price=101, side="Buy", market=True, take_profit_percentage_from_order=25)
+    # close_short_position()

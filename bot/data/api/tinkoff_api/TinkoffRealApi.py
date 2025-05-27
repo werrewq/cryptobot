@@ -2,7 +2,8 @@ import logging
 
 from tinkoff.invest import Client, OrderType, PostOrderResponse, OrderDirection, InstrumentType, \
     InstrumentShort, PositionsResponse, Quotation, StopOrderStatusOption, GetStopOrdersResponse, StopOrderDirection, \
-    StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse
+    StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse, TakeProfitType, \
+    ExchangeOrderType
 from tinkoff.invest.constants import INVEST_GRPC_API
 from tinkoff.invest.services import InstrumentsService
 
@@ -83,6 +84,8 @@ class TinkoffRealApi(TinkoffApi):
                 stop_price=stop_price,
                 expiration_type=StopOrderExpirationType.STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL,
                 stop_order_type=StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT,
+                take_profit_type=TakeProfitType.TAKE_PROFIT_TYPE_REGULAR,
+                exchange_order_type=ExchangeOrderType.EXCHANGE_ORDER_TYPE_MARKET,
                 price_type=PriceType.PRICE_TYPE_CURRENCY,
             )
 
@@ -92,7 +95,7 @@ class TinkoffRealApi(TinkoffApi):
             res = instruments.find_instrument(
                 query=ticker,
                 instrument_kind=instrument_type,
-                api_trade_available_flag=False,
+                api_trade_available_flag=True,
             )
             return res.instruments
 

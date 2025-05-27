@@ -79,32 +79,10 @@ class TinkoffSandboxApi(TinkoffApi):
             )
 
     def post_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
-        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
-            client.stop_orders.post_stop_order(
-                account_id=account_id,
-                figi=figi,
-                quantity=quantity,
-                direction=direction,
-                stop_price=stop_price,
-                expiration_type=StopOrderExpirationType.STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL,
-                stop_order_type=StopOrderType.STOP_ORDER_TYPE_STOP_LOSS,
-                price_type=PriceType.PRICE_TYPE_CURRENCY,
-                # order_id=datetime.now().strftime("%Y-%m-%dT %H:%M:%S"),
-            )
+        logging.debug("post_stop_loss_order not implemented in SANDBOX")
 
     def post_take_profit_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
-        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
-            client.stop_orders.post_stop_order(
-                account_id=account_id,
-                figi=figi,
-                quantity=quantity,
-                direction=direction,
-                stop_price=stop_price,
-                expiration_type=StopOrderExpirationType.STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL,
-                stop_order_type=StopOrderType.STOP_ORDER_TYPE_TAKE_PROFIT,
-                price_type=PriceType.PRICE_TYPE_CURRENCY,
-                # order_id=datetime.now().strftime("%Y-%m-%dT %H:%M:%S"),
-            )
+        logging.debug("post_take_profit_order not implemented in SANDBOX")
 
     def find_instruments_by_ticker(self, ticker, instrument_type: InstrumentType) -> list[InstrumentShort]:
         with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
@@ -112,7 +90,7 @@ class TinkoffSandboxApi(TinkoffApi):
             res = instruments.find_instrument(
                 query=ticker,
                 instrument_kind=instrument_type,
-                api_trade_available_flag=False,
+                api_trade_available_flag=True,
             )
             return res.instruments
 
