@@ -175,6 +175,7 @@ class TinkoffInteractor(BrokerApi):
 
         qty_to_close = int(self.get_target_asset_qty_on_account() * take_profit_intent.take_profit_percentage_from_order / 100)
 
+        logging.debug(f"Tinkoff interactor set_take_profit.market: = {str(take_profit_intent.market)}")
         if take_profit_intent.market:
             return self.__set_market_take_profit(direction, qty_to_close)
 

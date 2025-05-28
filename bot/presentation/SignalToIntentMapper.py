@@ -1,3 +1,5 @@
+import logging
+
 from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent, \
     CloseAllIntent
 from bot.domain.dto.TradingConfig import TradingConfig
@@ -21,6 +23,7 @@ class SignalToIntentMapper:
             case "take_profit":
                 take_profit_percentage = int(data["take_profit_percentage_from_order"]) if "take_profit_percentage_from_order" in data else 100
                 market = bool(data["market"]) if "market" in data else False
+                logging.debug(f"Signal mapper market = {str(market)}")
                 return TakeProfitIntent(
                     trading_config=self.__trading_config,
                     trigger_price=float(data["trigger_price"]),

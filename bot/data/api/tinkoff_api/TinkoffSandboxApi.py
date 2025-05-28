@@ -67,22 +67,20 @@ class TinkoffSandboxApi(TinkoffApi):
                     logging.debug(f"Ошибка при отмене заявки {order.id}: {e}")
 
     def get_stop_orders(self, account_id: str) -> GetStopOrdersResponse:
-        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
-            resp = client.stop_orders.get_stop_orders(account_id=account_id, status=StopOrderStatusOption.STOP_ORDER_STATUS_ACTIVE)
-            return resp
+        logging.debug("get_stop_orders not implemented in SANDBOX")
+        raise Exception("get_stop_orders not implemented in SANDBOX")
 
     def cancel_stop_order(self, account_id: str, stop_order_id: str):
-        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
-            client.stop_orders.cancel_stop_order(
-                account_id= account_id,
-                stop_order_id=stop_order_id
-            )
+        logging.debug("cancel_stop_order not implemented in SANDBOX")
+        raise Exception("cancel_stop_order not implemented in SANDBOX")
 
     def post_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
         logging.debug("post_stop_loss_order not implemented in SANDBOX")
+        raise Exception("post_stop_loss_order not implemented in SANDBOX")
 
     def post_take_profit_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
         logging.debug("post_take_profit_order not implemented in SANDBOX")
+        raise Exception("post_take_profit_order not implemented in SANDBOX")
 
     def find_instruments_by_ticker(self, ticker, instrument_type: InstrumentType) -> list[InstrumentShort]:
         with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
