@@ -52,12 +52,15 @@ class TinkoffInteractor(BrokerApi):
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
         quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots.buy_limits.buy_max_market_lots)} \n POJO_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
         direction = OrderDirection.ORDER_DIRECTION_BUY
         figi = self.__instrument_figi
-        quantity = self.get_max_market_lots().buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        max_market_lots = self.get_max_market_lots()
+        quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        logging.debug(f"place_buy_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots.buy_limits.buy_max_market_lots)} \n POJO_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def __place_market_order(self, direction: OrderDirection, quantity, figi) -> str:
