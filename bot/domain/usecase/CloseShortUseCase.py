@@ -16,7 +16,9 @@ class CloseShortUseCase:
 
     def __bot_close_short(self, trade_intent: TradeIntent):
         self.broker_api.cancel_all_active_orders(trading_config=trade_intent.trading_config)
-        if self.broker_api.have_order_short(trade_intent.trading_config):
+        has_short = self.broker_api.have_order_short(trade_intent.trading_config)
+        self.messenger_api.send_message(f"#Проверяем наличие открытых шортов: {str(has_short)}")
+        if has_short:
             self.messenger_api.send_message("#Закрываем SHORT")
             resp = self.broker_api.close_short_position(trade_intent.trading_config)
             self.messenger_api.send_message("#Закрыли SHORT ✅\n" + resp)

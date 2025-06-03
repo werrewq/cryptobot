@@ -33,6 +33,7 @@ class TinkoffInteractor(BrokerApi):
 
     def __has_position(self, direction: OrderDirection) -> bool:
         positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
+        logging.debug(f"__has_position:\n {str(positions)}")
 
         for position in positions.securities:
             if position.figi == self.__instrument_figi:
