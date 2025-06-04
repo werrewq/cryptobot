@@ -4,6 +4,7 @@ from time import sleep
 from tinkoff.invest import OrderDirection, InstrumentType, StopOrderDirection, GetMaxLotsResponse
 
 from bot.config.SecuredConfig import SecuredConfig
+from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.data.api.tinkoff_api.Helpers import float_to_quotation
 from bot.data.api.tinkoff_api.TinkoffApi import TinkoffApi
 from bot.domain.BrokerApi import BrokerApi
@@ -18,11 +19,19 @@ class TinkoffInteractor(BrokerApi):
     __account_id: str
     __instrument_figi: str
     __trading_config: TradingConfig
+    __retry_request_fabric: RetryRequestHandlerFabric
 
-    def __init__(self, tinkoff_api: TinkoffApi, secured_config: SecuredConfig, trading_config: TradingConfig):
+    def __init__(
+            self,
+            tinkoff_api: TinkoffApi,
+            secured_config: SecuredConfig,
+            trading_config: TradingConfig,
+            retry_request_fabric: RetryRequestHandlerFabric,
+    ):
         self.__tinkoff_api = tinkoff_api
         self.__account_id = secured_config.get_broker_account_id()
         self.__trading_config = trading_config
+        self.__retry_request_fabric = retry_request_fabric
         self.__instrument_figi = self.get_figi(ticker=trading_config.target_share_name, instrument_type=INSTRUMENT_TYPE)
 
     def have_order_long(self, trading_config: TradingConfig) -> bool:
@@ -49,14 +58,22 @@ class TinkoffInteractor(BrokerApi):
         return False
 
     def place_sell_order(self, short_intent: ShortIntent) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda : self.__place_sell_order(short_intent))
+
+    def __place_sell_order(self, short_intent: ShortIntent) -> str:
         direction: OrderDirection = OrderDirection.ORDER_DIRECTION_SELL
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
         quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
         logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots.buy_limits.buy_max_market_lots)} \n POJO_max_market_lots = {str(max_market_lots)}")
-        return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
+        return self.__place_market_order(direction=direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__place_buy_order(long_intent))
+
+    def __place_buy_order(self, long_intent: LongIntent) -> str:
         direction = OrderDirection.ORDER_DIRECTION_BUY
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
@@ -90,6 +107,10 @@ class TinkoffInteractor(BrokerApi):
         raise Exception("Не было найдено никаких ценных бумаг на аккаунте")
 
     def close_short_position(self, trading_config: TradingConfig) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__close_short_position(trading_config))
+
+    def __close_short_position(self, trading_config: TradingConfig) -> str:
         # Получаем портфель
         positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
         quantity_to_sell = None
@@ -107,8 +128,11 @@ class TinkoffInteractor(BrokerApi):
             sleep(2)
         return res
 
-
     def close_long_position(self, trading_config: TradingConfig) -> str:
+        retry_handler = self.__retry_request_fabric.create(request_limit=3)
+        return retry_handler.handle(lambda: self.__close_long_position(trading_config))
+
+    def __close_long_position(self, trading_config: TradingConfig) -> str:
         # Получаем портфель
         positions = self.__tinkoff_api.get_positions(account_id=self.__account_id)
         quantity_to_sell = None

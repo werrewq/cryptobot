@@ -94,6 +94,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         tinkoff_api = tinkoff_api,
         secured_config= secured_config,
         trading_config = trading_config,
+        retry_request_fabric = retry_request_handler_fabric,
     )
 
     close_short_usecase = providers.Factory(
