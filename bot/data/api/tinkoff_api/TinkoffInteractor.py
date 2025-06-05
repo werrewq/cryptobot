@@ -179,6 +179,9 @@ class TinkoffInteractor(BrokerApi):
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")
 
+        if (stop_loss_intent.side == "Sell" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_BUY) or (stop_loss_intent.side == "Buy" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_SELL):
+            raise Exception(f"Не правильное направление Stop Loss: side=={stop_loss_intent.side}, а  StopOrderDirection=={direction.name}")
+
         stop_price = float_to_quotation(stop_loss_intent.trigger_price)
 
         self.__tinkoff_api.post_stop_loss_order( # TODO нужно возвращать какой-то пруф от api
@@ -210,6 +213,9 @@ class TinkoffInteractor(BrokerApi):
             return self.__set_market_take_profit(direction, qty_to_close)
 
         stop_price = float_to_quotation(take_profit_intent.trigger_price)
+
+        if (take_profit_intent.side == "Sell" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_BUY) or (take_profit_intent.side == "Buy" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_SELL):
+            raise Exception(f"Не правильное направление Take Profit: side=={take_profit_intent.side}, а  StopOrderDirection=={direction.name}")
 
         self.__tinkoff_api.post_take_profit_order(
             figi=self.__instrument_figi,
