@@ -1,6 +1,5 @@
 import logging
 
-import tinkoff.invest
 from tinkoff.invest import Client, OrderType, PostOrderResponse, OrderDirection, InstrumentType, \
     InstrumentShort, PositionsResponse, Quotation, StopOrderStatusOption, GetStopOrdersResponse, StopOrderDirection, \
     StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse, TakeProfitType, \
@@ -20,9 +19,6 @@ class TinkoffRealApi(TinkoffApi):
     def __init__(self, secured_config: SecuredConfig):
         self.__token = secured_config.get_broker_api_key()
         self.__account_id = secured_config.get_broker_account_id()
-        tink_logger = tinkoff.invest.logging.logger
-        tink_logger.setLevel(logging.DEBUG)
-        tink_logger.propagate = True
 
     def client_show_all_accounts(self):
         with Client(token=self.__token, target=self.__target) as client:

@@ -23,6 +23,7 @@ from bot.domain.usecase.SetTakeProfitUseCase import SetTakeProfitUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
+from bot.presentation.logger.TinkoffLogger import TinkoffLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
 from bot.presentation.messenger.AuthManager import AuthManager
 from bot.presentation.messenger.MessagePresenter import MessagePresenter
@@ -50,6 +51,10 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     logger = providers.Singleton(
         BotLogger
+    )
+
+    tinkoff_logger = providers.Singleton(
+        TinkoffLogger
     )
 
     trading_logger: TradingLogger = providers.Singleton(

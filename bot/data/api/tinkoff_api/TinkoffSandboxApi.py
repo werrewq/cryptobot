@@ -2,14 +2,15 @@ import logging
 from decimal import Decimal
 
 from tinkoff.invest import Client, MoneyValue, OrderType, PostOrderResponse, OrderDirection, InstrumentType, \
-    InstrumentShort, PositionsResponse, Quotation, StopOrderStatusOption, GetStopOrdersResponse, StopOrderDirection, \
-    StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse
+    InstrumentShort, PositionsResponse, Quotation, GetStopOrdersResponse, StopOrderDirection, \
+    GetMaxLotsRequest, GetMaxLotsResponse
 from tinkoff.invest.constants import INVEST_GRPC_API_SANDBOX
 from tinkoff.invest.services import InstrumentsService
 from tinkoff.invest.utils import decimal_to_quotation
 
 from bot.config.SecuredConfig import SecuredConfig
 from bot.data.api.tinkoff_api.TinkoffApi import TinkoffApi
+
 
 class TinkoffSandboxApi(TinkoffApi):
     __token: str
