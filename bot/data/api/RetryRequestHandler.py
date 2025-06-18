@@ -1,7 +1,7 @@
 import logging
 import traceback
 
-from pybit import exceptions
+from tinkoff.invest import RequestError
 
 from bot.domain.MessengerApi import MessengerApi
 
@@ -21,33 +21,33 @@ class RetryRequestHandler:
         try:
             self.__request_limit = self.__request_limit - 1
             return func()
-        except exceptions.InvalidRequestError as e:
+        except RequestError as e:
             logging.error(
                 msg="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
+                        + "ByBit API Request Error" + " | " + str(e.code) + " | " + e.details
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
             )
             self.__messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
+                        + "ByBit API Request Error" + " | " + str(e.code) + " | " + e.details
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
             )
             return self.retry_request(func)
-        except exceptions.FailedRequestError as e:
+        except Exception as e:
             logging.error(
                 msg="Ошибка во время запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
+                        + "ByBit API Request Error" + " | "
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
             )
             self.__messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.status_code) + " | " + e.message
+                        + "ByBit API Request Error" + " | "
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
