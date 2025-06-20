@@ -24,14 +24,14 @@ class RetryRequestHandler:
         except RequestError as e:
             logging.error(
                 msg="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.code) + " | " + e.details
+                        + "Tinkoff API Request Error" + " | " + str(e.code) + " | " + e.details
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
             )
             self.__messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | " + str(e.code) + " | " + e.details
+                        + "Tinkoff API Request Error" + " | " + str(e.code) + " | " + e.details
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
@@ -40,14 +40,14 @@ class RetryRequestHandler:
         except Exception as e:
             logging.error(
                 msg="Ошибка во время запроса на api: \n"
-                        + "ByBit API Request Error" + " | "
+                        + "Tinkoff API Request Error" + " | "
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
             )
             self.__messenger.send_message(
                 message="Ошибка неправильного запроса на api: \n"
-                        + "ByBit API Request Error" + " | "
+                        + "Tinkoff API Request Error" + " | "
                         + repr(e)
                         + "\n"
                         + str(traceback.format_exc())
