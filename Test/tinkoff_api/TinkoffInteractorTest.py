@@ -3,7 +3,7 @@ from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
 from bot.data.api.tinkoff_api.TinkoffInteractor import TinkoffInteractor
 from bot.data.api.tinkoff_api.TinkoffSandboxApi import TinkoffSandboxApi
-from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent, TakeProfitIntent
+from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent, TakeProfitIntent, RevertLimitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.BotLogger import BotLogger
 
@@ -51,6 +51,10 @@ def cancel_all_orders():
 def set_take_profit(trigger_price, side = "Sell", market = False, take_profit_percentage_from_order = 100):
     intent = TakeProfitIntent(trading_config, side=side, trigger_price=trigger_price, take_profit_percentage_from_order=take_profit_percentage_from_order, market= market)
     tinkoff_interactor.set_take_profit(intent)
+
+def set_revert_limit(trigger_price, side = "Sell"):
+    intent = RevertLimitIntent(trading_config, side= side, trigger_price=trigger_price)
+    tinkoff_interactor.set_revert_limit(intent)
 
 if __name__ == '__main__':
     place_sell_order()

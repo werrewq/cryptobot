@@ -1,6 +1,6 @@
 import abc
 
-from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent
+from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent, RevertLimitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 
@@ -40,4 +40,8 @@ class BrokerApi:
 
     @abc.abstractmethod
     def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
+        pass
+
+    @abc.abstractmethod
+    def set_revert_limit(self, revert_limit_intent: RevertLimitIntent) -> str:
         pass

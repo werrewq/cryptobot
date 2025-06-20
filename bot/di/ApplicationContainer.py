@@ -20,6 +20,7 @@ from bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
 from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
 from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
 from bot.domain.usecase.SetTakeProfitUseCase import SetTakeProfitUseCase
+from bot.domain.usecase.SetRevertLimitUseCase import SetRevertLimitUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
@@ -140,6 +141,12 @@ class ApplicationContainer(containers.DeclarativeContainer):
         messenger_api = messenger_api
     )
 
+    set_revert_limit_usecase = providers.Factory(
+        SetRevertLimitUseCase,
+        broker_api = broker_api,
+        messenger_api = messenger_api
+    )
+
     close_all_usecase = providers.Factory(
         CloseAllUseCase,
         broker_api = broker_api,
@@ -152,6 +159,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         open_short_usecase = open_short_usecase,
         set_stop_loss_usecase = set_stop_loss_usecase,
         set_take_profit_usecase = set_take_profit_usecase,
+        set_revert_limit_usecase = set_revert_limit_usecase,
         close_all_usecase = close_all_usecase,
         messenger_api = messenger_api,
         trading_status_interactor = trading_status_interactor

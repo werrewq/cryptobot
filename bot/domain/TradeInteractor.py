@@ -3,8 +3,8 @@ import logging
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor, TradingStatus
 from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent, TakeProfitIntent, \
-    CloseAllIntent
-from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase, SetTakeProfitUseCase, CloseAllUseCase
+    CloseAllIntent, RevertLimitIntent
+from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase, SetTakeProfitUseCase, CloseAllUseCase, SetRevertLimitUseCase
 
 
 class TradeInteractor:
@@ -14,6 +14,7 @@ class TradeInteractor:
     __set_stop_loss_usecase: SetStopLossUseCase
     __trading_status_interactor: TradingStatusInteractor
     __set_take_profit_usecase: SetTakeProfitUseCase
+    __set_revert_limit_usecase: SetRevertLimitUseCase
 
     def __init__(
             self,
@@ -21,6 +22,7 @@ class TradeInteractor:
             open_short_usecase: OpenShortUseCase,
             set_stop_loss_usecase: SetStopLossUseCase,
             set_take_profit_usecase: SetTakeProfitUseCase,
+            set_revert_limit_usecase: SetRevertLimitUseCase,
             close_all_usecase: CloseAllUseCase,
             messenger_api: MessengerApi,
             trading_status_interactor: TradingStatusInteractor,
@@ -31,6 +33,7 @@ class TradeInteractor:
         self.__set_stop_loss_usecase = set_stop_loss_usecase
         self.__trading_status_interactor = trading_status_interactor
         self.__set_take_profit_usecase = set_take_profit_usecase
+        self.__set_revert_limit_usecase = set_revert_limit_usecase
         self.__close_all_usecase = close_all_usecase
 
     def start_trade(self, trade_intent: TradeIntent):
@@ -53,6 +56,9 @@ class TradeInteractor:
 
             case TakeProfitIntent():
                 self.__set_take_profit_usecase.run(trade_intent)
+
+            case RevertLimitIntent():
+                self.__set_revert_limit_usecase.run(trade_intent)
 
             case CloseAllIntent():
                 self.__close_all_usecase.run(trade_intent)

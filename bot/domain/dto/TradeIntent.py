@@ -28,3 +28,7 @@ class TakeProfitIntent(TradeIntent):
     trigger_price: float
     take_profit_percentage_from_order: int
     market: bool
+
+@dataclass
+class RevertLimitIntent(TradeIntent):
+    trigger_price: float

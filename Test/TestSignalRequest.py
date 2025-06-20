@@ -103,6 +103,19 @@ def set_take_profit_market(stop_price: float, side: str, take_profit_percentage:
     print("Response status code:", response.status_code)
     print("Response JSON:", str(response.json()))
 
+def set_revert_limit(stop_price: float, side: str):
+    print("--------STOP LOSS TEST--------")
+    data = json.dumps({
+        "signal": "revert_limit",
+        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "side": side,
+        "stop_price": str(stop_price),
+    })
+    response = requests.post(url + "/position", json=data, headers= headers)
+    print("Response: " + response.text)
+    print("Response status code:", response.status_code)
+    print("Response JSON:", str(response.json()))
+
 def close_all():
     print("--------CLOSE ALL--------")
     data = json.dumps({

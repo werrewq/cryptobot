@@ -8,7 +8,7 @@ from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.data.api.tinkoff_api.Helpers import float_to_quotation
 from bot.data.api.tinkoff_api.TinkoffApi import TinkoffApi
 from bot.domain.BrokerApi import BrokerApi
-from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent, TakeProfitIntent
+from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent, TakeProfitIntent, RevertLimitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 INSTRUMENT_TYPE = InstrumentType.INSTRUMENT_TYPE_SHARE # TODO вывести в трейдинг конфиг, закрыв абстракцией от внутрянки тинька
@@ -260,3 +260,33 @@ class TinkoffInteractor(BrokerApi):
             return buy_max_lots
         else:
             return buy_max_market_lots
+
+    def set_revert_limit(self, revert_limit_intent: RevertLimitIntent) -> str:
+        orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
+        for order in orders.stop_orders:
+            self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
+
+        direction = None
+        if self.have_long_position(revert_limit_intent.trading_config):
+            direction = StopOrderDirection.STOP_ORDER_DIRECTION_SELL
+        elif self.have_short_position(revert_limit_intent.trading_config):
+            direction = StopOrderDirection.STOP_ORDER_DIRECTION_BUY
+        if direction is None:
+            raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")
+
+        if (revert_limit_intent.side == "Sell" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_BUY) or (
+                revert_limit_intent.side == "Buy" and direction is StopOrderDirection.STOP_ORDER_DIRECTION_SELL):
+            raise Exception(
+                f"Не правильное направление Revert Limit: side=={revert_limit_intent.side}, а  StopOrderDirection=={direction.name}")
+
+        stop_price = float_to_quotation(revert_limit_intent.trigger_price)
+        revert_qty = int(self.get_target_asset_qty_on_account() * 2)
+
+        self.__tinkoff_api.post_take_profit_order(
+            figi=self.__instrument_figi,
+            quantity=revert_qty,
+            direction=direction,
+            stop_price=stop_price,
+            account_id=self.__account_id,
+        )
+        return f"Стоп лосс успешно установлен на цене {str(revert_limit_intent.trigger_price)}"
