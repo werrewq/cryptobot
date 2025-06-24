@@ -65,8 +65,8 @@ class TinkoffInteractor(BrokerApi):
         direction: OrderDirection = OrderDirection.ORDER_DIRECTION_SELL
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
-        quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
-        logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots.buy_limits.buy_max_market_lots)} \n POJO_max_market_lots = {str(max_market_lots)}")
+        quantity = max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction=direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
@@ -77,8 +77,8 @@ class TinkoffInteractor(BrokerApi):
         direction = OrderDirection.ORDER_DIRECTION_BUY
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
-        quantity = max_market_lots.buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
-        logging.debug(f"place_buy_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots.buy_limits.buy_max_market_lots)} \n POJO_max_market_lots = {str(max_market_lots)}")
+        quantity = max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        logging.debug(f"place_buy_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def __place_market_order(self, direction: OrderDirection, quantity, figi) -> str:
@@ -234,5 +234,29 @@ class TinkoffInteractor(BrokerApi):
         resp = self.__place_market_order(direction=direction, quantity=qty_to_close, figi=self.__instrument_figi)
         return f"Take profit по маркету успешно выполнен.\n {resp}"
 
-    def get_max_market_lots(self) -> GetMaxLotsResponse:
-        return self.__tinkoff_api.get_max_market_lots(account_id=self.__account_id, figi=self.__instrument_figi)
+    def get_max_market_lots(self) -> int:
+        res = self.__tinkoff_api.get_max_market_lots(account_id=self.__account_id, figi=self.__instrument_figi)
+        buy_max_lots = res.buy_limits.buy_max_lots
+        margin_buy_max_market_lots = res.buy_margin_limits.buy_max_market_lots
+        buy_max_market_lots = res.buy_limits.buy_max_market_lots
+        logging.debug(f"get_max_market_lots:\n{str(res)}")
+        # TODO обрабатываем странное поведение API buy_max_lots=8 при buy_max_market_lots=0
+        # GetMaxLotsResponse(
+        #     currency='RUB',
+        #     buy_limits=BuyLimitsView(
+        #         buy_money_amount=Quotation(units=28952, nano=0),
+        #         buy_max_lots=8,
+        #         buy_max_market_lots=0
+        #     ),
+        #     buy_margin_limits=BuyLimitsView(
+        #         buy_money_amount=Quotation(units=231616, nano=0),
+        #         buy_max_lots=69,
+        #         buy_max_market_lots=68),
+        #     sell_limits=SellLimitsView(sell_max_lots=0),
+        #     sell_margin_limits=SellLimitsView(sell_max_lots=43)
+        # )
+        if buy_max_market_lots == 0 and buy_max_lots > 0 and margin_buy_max_market_lots > 0:
+            logging.debug(f"Ошибка API:\n  buy_max_market_lots == 0 and buy_max_lots > 0 and margin_buy_max_market_lots > 0")
+            return buy_max_lots
+        else:
+            return buy_max_market_lots
