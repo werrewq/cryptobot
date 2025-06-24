@@ -107,6 +107,7 @@ def set_revert_limit(stop_price: float, side: str):
     print("--------STOP LOSS TEST--------")
     data = json.dumps({
         "signal": "revert_limit",
+        "timestamp": "1234566",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "stop_price": str(stop_price),
@@ -120,6 +121,7 @@ def close_all():
     print("--------CLOSE ALL--------")
     data = json.dumps({
         "signal": "close_all",
+        "timestamp": "1234567",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
