@@ -9,7 +9,8 @@ class TradingStatusInteractor:
     __trading_status: TradingStatus
 
     def __init__(self):
-        self.__trading_status = TradingStatus.OFFLINE
+        # self.__trading_status = TradingStatus.OFFLINE
+        self.__trading_status = TradingStatus.ONLINE # TODO когда бот падает, надо чтобы он продолжил торговать при рестарте
 
     def get_trading_status(self) -> TradingStatus:
         status = self.__trading_status
