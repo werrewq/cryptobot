@@ -11,9 +11,9 @@ test_chat_pass = "qwerty"
 test_telegram_bot_api_token = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk"
 test_cryptobot_api_token = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
 
-# Demo trading test
-test_broker_api_key = "2muBHMXMcmq69KfJ9u"
-test_broker_secret_key = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
+# Sandbox trading test
+test_broker_api_key = ""
+test_broker_secret_key = ""
 
 # Тестовые ключи
 # test_broker_api_key = "6pAf7l2HZn46GqJqu6"
@@ -26,8 +26,8 @@ test_broker_secret_key = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
 # ENCRYPTED TEST DATA:
 test_broker_api_key=""
 broker_account_id=""
-test_telegram_bot_api_token="nkehNJmDNtREwe9bD7fCMED0UrLitJc8kMrcHtxUYmJ7Ky7vMSLwY68t3P4Js991xG67qXPskQvi51MjGA0="
-test_cryptobot_api_token="ZneAYlbPyFn7YSHGNbMhbTi2doRmuMjwptnsMfudU1ekO1u2LwnwBP0acyGR/6moUaR6dXFS3mRMbXsoN1/DeXE3G5Ygat9lSWb7O3KkgSk="
+test_telegram_bot_api_token=""
+test_cryptobot_api_token=""
 
 class EnvironmentVariables:
 
@@ -112,4 +112,5 @@ class SecuredConfig(EnvironmentVariables):
         return self.__environment_variables.get_chat_pass()
 
     def get_broker_account_id(self):
-        raise self.__environment_variables.get_broker_account_id()
+        id = self.__environment_variables.get_broker_account_id()
+        return self.__decrypter.decrypt(id)

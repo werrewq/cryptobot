@@ -1,4 +1,7 @@
-from tinkoff.invest import OrderDirection, InstrumentType, StopOrderDirection
+import logging
+from time import sleep
+
+from tinkoff.invest import OrderDirection, InstrumentType, StopOrderDirection, GetMaxLotsResponse
 
 from bot.config.SecuredConfig import SecuredConfig
 from bot.data.api.tinkoff_api.Helpers import float_to_quotation
@@ -19,8 +22,8 @@ class TinkoffInteractor(BrokerApi):
     def __init__(self, tinkoff_api: TinkoffApi, secured_config: SecuredConfig, trading_config: TradingConfig):
         self.__tinkoff_api = tinkoff_api
         self.__account_id = secured_config.get_broker_account_id()
-        self.__instrument_figi = self.get_figi(ticker=trading_config.target_share_name, instrument_type=INSTRUMENT_TYPE)
         self.__trading_config = trading_config
+        self.__instrument_figi = self.get_figi(ticker=trading_config.target_share_name, instrument_type=INSTRUMENT_TYPE)
 
     def have_order_long(self, trading_config: TradingConfig) -> bool:
         return self.__has_position(direction=OrderDirection.ORDER_DIRECTION_BUY)
@@ -47,19 +50,14 @@ class TinkoffInteractor(BrokerApi):
     def place_sell_order(self, short_intent: ShortIntent) -> str:
         direction: OrderDirection = OrderDirection.ORDER_DIRECTION_SELL
         figi = self.__instrument_figi
-        balance = self.get_balance()
-        asset_price = self.__tinkoff_api.get_last_price(figi)
-        quantity = abs(int(balance.units / asset_price.units.real))
-        return self.__place_market_order(direction= direction, quantity=quantity, figi=figi)
+        quantity = self.get_max_market_lots().sell_margin_limits.sell_max_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
         direction = OrderDirection.ORDER_DIRECTION_BUY
         figi = self.__instrument_figi
-        balance = self.get_balance()
-        asset_price = self.__tinkoff_api.get_last_price(figi)
-        quantity = abs(int(balance.units / asset_price.units.real))
-
-        return self.__place_market_order(direction= direction, quantity=quantity, figi=figi)
+        quantity = self.get_max_market_lots().buy_limits.buy_max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 
     def __place_market_order(self, direction: OrderDirection, quantity, figi) -> str:
         resp = self.__tinkoff_api.post_market_order(
@@ -98,7 +96,12 @@ class TinkoffInteractor(BrokerApi):
             raise Exception("Не найдено количество бумаг для закрытия шорта")
         quantity_to_sell = abs(quantity_to_sell)
         # Отправляем рыночный ордер на продажу такого же количества в противоположную сторону
-        return self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_BUY, quantity=quantity_to_sell, figi=self.__instrument_figi)
+        res = self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_BUY, quantity=quantity_to_sell, figi=self.__instrument_figi)
+        while self.have_order_short(trading_config):
+            logging.debug("close_short_position sleep")
+            sleep(2)
+        return res
+
 
     def close_long_position(self, trading_config: TradingConfig) -> str:
         # Получаем портфель
@@ -111,7 +114,12 @@ class TinkoffInteractor(BrokerApi):
         if quantity_to_sell is None:
             raise Exception("Не найдено количество бумаг для закрытия лонга")
         # Отправляем рыночный ордер на продажу такого же количества в противоположную сторону
-        return self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_SELL, quantity=quantity_to_sell, figi=self.__instrument_figi)
+        res = self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_SELL, quantity=quantity_to_sell, figi=self.__instrument_figi)
+        while self.have_order_long(trading_config):
+            logging.debug("close_long_position sleep")
+            sleep(2)
+        return res
+
 
     def cancel_all_active_orders(self, trading_config: TradingConfig):
         self.__tinkoff_api.cancel_all_orders()
@@ -142,7 +150,7 @@ class TinkoffInteractor(BrokerApi):
 
         stop_price = float_to_quotation(StopLossIntent.trigger_price)
 
-        self.__tinkoff_api.post_stop_loss_order(
+        self.__tinkoff_api.post_stop_loss_order( # TODO нужно возвращать какой-то пруф от api
             figi=self.__instrument_figi,
             quantity=self.get_target_asset_qty_on_account(),
             direction=direction,
@@ -154,7 +162,7 @@ class TinkoffInteractor(BrokerApi):
     # TODO проверить на бою
     def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
 
-        # TODO логика для market и procent
+        # TODO логика для market и percent
         orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
         for order in orders.stop_orders:
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
@@ -166,13 +174,29 @@ class TinkoffInteractor(BrokerApi):
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")
 
+        qty_to_close = int(self.get_target_asset_qty_on_account() * take_profit_intent.take_profit_percentage_from_order / 100)
+
+        if take_profit_intent.market:
+            return self.__set_market_take_profit(direction, qty_to_close)
+
         stop_price = float_to_quotation(StopLossIntent.trigger_price)
 
         self.__tinkoff_api.post_take_profit_order(
             figi=self.__instrument_figi,
-            quantity=self.get_target_asset_qty_on_account(),
+            quantity=qty_to_close,
             direction=direction,
             stop_price=stop_price,
             account_id=self.__account_id,
         )
-        return f"Стоп лосс успешно установлен на цене {str(StopLossIntent.trigger_price)}"
+        return f"Take profit успешно установлен на цене {str(StopLossIntent.trigger_price)}"
+
+    def __set_market_take_profit(self, direction, qty_to_close):
+        if direction is StopOrderDirection.STOP_ORDER_DIRECTION_SELL:
+            direction = OrderDirection.ORDER_DIRECTION_SELL
+        else:
+            direction = OrderDirection.ORDER_DIRECTION_BUY
+        resp = self.__place_market_order(direction=direction, quantity=qty_to_close, figi=self.__instrument_figi)
+        return f"Take profit по маркету успешно выполнен.\n {resp}"
+
+    def get_max_market_lots(self) -> GetMaxLotsResponse:
+        return self.__tinkoff_api.get_max_market_lots(account_id=self.__account_id, figi=self.__instrument_figi)

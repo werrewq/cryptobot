@@ -2,7 +2,7 @@ import logging
 
 from tinkoff.invest import Client, OrderType, PostOrderResponse, OrderDirection, InstrumentType, \
     InstrumentShort, PositionsResponse, Quotation, StopOrderStatusOption, GetStopOrdersResponse, StopOrderDirection, \
-    StopOrderExpirationType, StopOrderType, PriceType
+    StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse
 from tinkoff.invest.constants import INVEST_GRPC_API
 from tinkoff.invest.services import InstrumentsService
 
@@ -107,3 +107,13 @@ class TinkoffRealApi(TinkoffApi):
                 figi= [figi]
             )
             return res.last_prices[0].price
+
+    def get_max_market_lots(self, account_id: str, figi: str) -> GetMaxLotsResponse:
+        with Client(token=self.__token, target=self.__target) as client:
+            res = client.orders.get_max_lots(
+                request=GetMaxLotsRequest(
+                    account_id=account_id,
+                    instrument_id=figi,
+                )
+            )
+            return res

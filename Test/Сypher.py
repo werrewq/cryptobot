@@ -54,10 +54,10 @@ def prepare_data(
     print(f"TELEGRAM_BOT_API_TOKEN={decrypted_telegram_bot_api_token}")
     print(f"CRYPTOBOT_API_TOKEN={decrypted_cryptobot_api_token}")
 
-test_broker_api_key = "2muBHMXMcmq69KfJ9u"
-test_broker_account_id = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
-test_telegram_bot_api_token = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk"
-test_cryptobot_api_token = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+test_broker_api_key=""
+test_broker_account_id=""
+test_telegram_bot_api_token=""
+test_cryptobot_api_token=""
 
 if __name__ == "__main__":
     prepare_data(

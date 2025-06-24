@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from tinkoff.invest import Client, MoneyValue, OrderType, PostOrderResponse, OrderDirection, InstrumentType, \
     InstrumentShort, PositionsResponse, Quotation, StopOrderStatusOption, GetStopOrdersResponse, StopOrderDirection, \
-    StopOrderExpirationType, StopOrderType, PriceType
+    StopOrderExpirationType, StopOrderType, PriceType, GetMaxLotsRequest, GetMaxLotsResponse
 from tinkoff.invest.constants import INVEST_GRPC_API_SANDBOX
 from tinkoff.invest.services import InstrumentsService
 from tinkoff.invest.utils import decimal_to_quotation
@@ -123,8 +123,17 @@ class TinkoffSandboxApi(TinkoffApi):
 
     def get_last_price(self, figi: str) -> Quotation:
         with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
-            # client.orders.get_max_lots
             res = client.market_data.get_last_prices(
                 figi= [figi]
             )
             return res.last_prices[0].price
+
+    def get_max_market_lots(self, account_id: str, figi: str) -> GetMaxLotsResponse:
+        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
+            res = client.orders.get_max_lots(
+                request=GetMaxLotsRequest(
+                    account_id=account_id,
+                    instrument_id=figi,
+                )
+            )
+            return res

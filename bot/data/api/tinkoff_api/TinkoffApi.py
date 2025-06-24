@@ -1,7 +1,7 @@
 import abc
 
 from tinkoff.invest import PostOrderResponse, InstrumentType, InstrumentShort, PositionsResponse, \
-    Quotation, GetStopOrdersResponse, StopOrderDirection
+    Quotation, GetStopOrdersResponse, StopOrderDirection, GetMaxLotsResponse
 
 from tinkoff.invest import OrderDirection
 
@@ -44,7 +44,9 @@ class TinkoffApi:
     def post_take_profit_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
         pass
 
-
+    @abc.abstractmethod
+    def get_max_market_lots(self, account_id: str, figi: str) -> GetMaxLotsResponse:
+        pass
 
 
 

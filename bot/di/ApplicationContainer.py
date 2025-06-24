@@ -37,11 +37,11 @@ class ApplicationContainer(containers.DeclarativeContainer):
 
     decrypter: Decrypter = providers.Singleton(
         Decrypter,
-        key = b'\x9fY\x8c\xa7\xdf$[\xdeg\xcd\xd6\xf2\xc6\xb9[D\x9b\x03\xf8\xe4lZ\xf4%\xb7\xb0\xcc\x19\xe7\x89\xaf\xf1'
+        key = b'O\xa0\xd3\xe5[m\x8fRWY#\r\x96\xd4\xe7\x9d\x9b\xbe;D\xd4\x00wNA\xe3\xb1o\x8fM\x1c)'
         # local debug key=b'\xda\xff\x84\xceVQ\nr(\x99?\x8b\x074\x05\x1a\xb0\x99\x95\x14z\x96\xd0\n\xf9dB\xa4\xd5j\xcd\xfd'
     )
 
-    secured_config: SecuredConfig = providers.Singleton(
+    secured_config = providers.Singleton(
         SecuredConfig,
         trading_config = trading_config,
         decrypter = decrypter,
@@ -86,7 +86,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         trading_config = trading_config,
     )
 
-    tinkoff_api = TinkoffApiProvider(trading_config= trading_config, secured_config=secured_config)
+    tinkoff_api = TinkoffApiProvider(trading_config= trading_config, secured_config=secured_config()).provide()
 
     broker_api: BrokerApi = providers.Singleton(
         TinkoffInteractor,

@@ -16,10 +16,10 @@ class TradeInteractor:
 
     def __init__(
             self,
-            open_long_usecase,
-            open_short_usecase,
-            set_stop_loss_usecase,
-            set_take_profit_usecase,
+            open_long_usecase: OpenLongUseCase,
+            open_short_usecase: OpenShortUseCase,
+            set_stop_loss_usecase: SetStopLossUseCase,
+            set_take_profit_usecase: SetTakeProfitUseCase,
             messenger_api: MessengerApi,
             trading_status_interactor: TradingStatusInteractor,
     ):
