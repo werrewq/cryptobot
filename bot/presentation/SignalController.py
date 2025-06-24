@@ -45,9 +45,12 @@ class SignalController:
         async def trading_signals():
             json_data = self.get_dict_from_request(request.json)
             if not self.check_token(json_data):
-                logging.debug("WRONG TOKEN")
+                logging.debug("401 Unauthorized: WRONG TOKEN")
                 return "401 Unauthorized"
             logging.debug("Signal from TRADING VIEW \n" + str(json_data["signal"]))
+            if not "timestamp" in json_data:
+                logging.debug("400 Bad Request: Don't have timestamp in request")
+                return "400 Bad Request: Don't have timestamp in request"
             # Отправляем запрос в очередь задач на выполнение
             self.__request_queue.add_request(json_data)
             return "200"

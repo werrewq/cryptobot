@@ -9,6 +9,7 @@ from bot.presentation.worker.RequestTimePriorityQueue import RequestTimePriority
 import threading
 import asyncio
 import logging
+import traceback
 
 class RequestEventLoop:
 
@@ -46,14 +47,22 @@ class RequestEventLoop:
 
     async def __process_requests(self):
         while True:
-            # Выполняем все запросы накопившиеся за секунду
-            if not self.__request_queue.is_empty():
-                data = await self.__request_queue.poll_oldest_request()
-                # Обрабатываем запрос
-                await self.__handle_request(data)
-            else:
-                # Если очередь пуста, делаем паузу
-                await asyncio.sleep(1)
+            try:
+                # Выполняем все запросы накопившиеся за секунду
+                if not self.__request_queue.is_empty():
+                    data = await self.__request_queue.poll_oldest_request()
+                    # Обрабатываем запрос
+                    await self.__handle_request(data)
+                else:
+                    # Если очередь пуста, делаем паузу
+                    await asyncio.sleep(1)
+            except Exception as e:
+                logging.error(
+                    msg="Ошибка на RequestEventLoop: \n"
+                    + repr(e)
+                    + "\n"
+                    + str(traceback.format_exc())
+                )
 
     async def __handle_request(self, data: dict[str, Any]):
         time = data["timestamp"]
