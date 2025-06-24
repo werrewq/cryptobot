@@ -10,7 +10,7 @@ from bot.domain.BrokerApi import BrokerApi
 from bot.domain.dto.TradeIntent import StopLossIntent, ShortIntent, LongIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
-INSTRUMENT_TYPE = InstrumentType.INSTRUMENT_TYPE_SHARE # TODO вывести в трейдинг конфиг закрыв абстракцией от внутрянки тинька
+INSTRUMENT_TYPE = InstrumentType.INSTRUMENT_TYPE_SHARE # TODO вывести в трейдинг конфиг, закрыв абстракцией от внутрянки тинька
 MONEY_CURRENCY = "rub" # TODO вывести в трейдинг конфиг
 
 class TinkoffInteractor(BrokerApi):
@@ -67,7 +67,7 @@ class TinkoffInteractor(BrokerApi):
             direction=direction
         )
         balance = self.get_balance()
-        order_message = f'''Тип сделки: Market\nБумага: {self.__trading_config.target_share_name}\nНаправление: {str(direction)}\n Количество: {str(resp.total_order_amount)}\n Цена выполнения: {str(resp.executed_order_price)}\n Баланс на кошельке: {str(balance)}'''
+        order_message = f'''Тип сделки: Market\nБумага: {self.__trading_config.target_share_name}\nНаправление: {str(direction.value)}\n Сумма заказа: {str(resp.total_order_amount.units)}\n Цена одной акции: {str(resp.executed_order_price.units)}\n Баланс на кошельке: {str(balance.units)}'''
         return order_message
 
     def get_balance(self):
@@ -162,7 +162,6 @@ class TinkoffInteractor(BrokerApi):
     # TODO проверить на бою
     def set_take_profit(self, take_profit_intent: TakeProfitIntent) -> str:
 
-        # TODO логика для market и percent
         orders = self.__tinkoff_api.get_stop_orders(self.__account_id)
         for order in orders.stop_orders:
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
