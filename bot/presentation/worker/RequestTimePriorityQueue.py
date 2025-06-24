@@ -23,12 +23,12 @@ class RequestTimePriorityQueue:
 
     async def __put_request(self, json_request_data: dict[str, Any]):
         time_data = (json_request_data["timestamp"],json_request_data)
-        print(f"put request time = {time_data[0]},\ndata = {time_data[1]}")
+        logging.debug(f"put request time = {time_data[0]},\ndata = {time_data[1]}")
         await self.__request_queue.put(time_data)
 
     async def poll_oldest_request(self) -> dict[str, Any]:
         time, data = await self.__request_queue.get()
-        print(f"poll request time = {time},\ndata = {data}")
+        logging.debug(f"poll request time = {time},\ndata = {data}")
         return data
 
     def is_empty(self) -> bool:
