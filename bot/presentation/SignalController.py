@@ -2,44 +2,37 @@ import json
 import logging
 from typing import Dict, Any
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, send_file
 
 from bot.config.SecuredConfig import SecuredConfig
-from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
-from bot.domain.TradeInteractor import TradeInteractor
-from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
 from bot.presentation.logger.TradingLogger import TradingLogger
+from bot.presentation.worker.RequestTimePriorityQueue import RequestTimePriorityQueue
+
 
 class SignalController:
-    __mapper: SignalToIntentMapper
     __messenger: MessengerApi
     __flask: Flask = Flask(__name__)
-    __interactor: TradeInteractor
-    __error_handler: ErrorHandler
     __logger: BotLogger
     __trade_logger: TradingLogger
     __secured_config: SecuredConfig
+    __request_queue: RequestTimePriorityQueue
 
     def __init__(
             self,
-            mapper: SignalToIntentMapper,
             messenger: MessengerApi,
-            interactor: TradeInteractor,
-            error_handler: ErrorHandler,
             logger: BotLogger,
             trade_logger: TradingLogger,
-            secured_config: SecuredConfig
+            secured_config: SecuredConfig,
+            request_queue: RequestTimePriorityQueue
     ):
-        self.__mapper = mapper
         self.__messenger = messenger
-        self.__interactor = interactor
-        self.__error_handler = error_handler
-        self.setup_handlers()
         self.__logger = logger
         self.__trade_logger = trade_logger
         self.__secured_config = secured_config
+        self.__request_queue = request_queue
+        self.setup_handlers()
 
     def run(self):
         print("Запускаем Flask")
@@ -47,6 +40,7 @@ class SignalController:
         return self.__flask
 
     def setup_handlers(self):
+
         @self.__flask.route('/position', methods=['GET', 'POST'])
         async def trading_signals():
             json_data = self.get_dict_from_request(request.json)
@@ -54,8 +48,8 @@ class SignalController:
                 logging.debug("WRONG TOKEN")
                 return "401 Unauthorized"
             logging.debug("Signal from TRADING VIEW \n" + str(json_data["signal"]))
-            self.__messenger.send_message("Signal from TRADING VIEW \n" + str(json_data["signal"]))
-            self.__error_handler.handle(lambda : process_signal(json_data))
+            # Отправляем запрос в очередь задач на выполнение
+            self.__request_queue.add_request(json_data)
             return "200"
 
         @self.__flask.route("/")
@@ -82,10 +76,6 @@ class SignalController:
             logging.debug("Logs download request")
             file_path = self.__trade_logger.get_logs_path()
             return send_file(file_path, as_attachment=True)
-
-        def process_signal(json_data):
-            intent = self.__mapper.map(json_data)
-            self.__interactor.start_trade(intent)
 
     def get_dict_from_request(self, json_data) -> Dict[str, Any]:
         # Проверяем, является ли json_data строкой

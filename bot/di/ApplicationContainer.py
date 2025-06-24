@@ -27,6 +27,9 @@ from bot.presentation.logger.TradingLogger import TradingLogger
 from bot.presentation.messenger.AuthManager import AuthManager
 from bot.presentation.messenger.MessagePresenter import MessagePresenter
 from bot.presentation.messenger.TelegramApi import TelegramApi
+from bot.presentation.worker.EventLoop import EventLoop
+from bot.presentation.worker.RequestEventLoop import RequestEventLoop
+from bot.presentation.worker.RequestTimePriorityQueue import RequestTimePriorityQueue
 
 
 class ApplicationContainer(containers.DeclarativeContainer):
@@ -151,13 +154,30 @@ class ApplicationContainer(containers.DeclarativeContainer):
         messenger = messenger_api,
     )
 
+    event_loop: EventLoop = providers.Singleton(
+        EventLoop,
+    )
+
+    request_queue: RequestTimePriorityQueue = providers.Singleton(
+        RequestTimePriorityQueue,
+        event_loop = event_loop
+    )
+
+    request_event_loop: RequestEventLoop = providers.Singleton(
+        RequestEventLoop,
+        request_queue = request_queue,
+        event_loop = event_loop,
+        interactor = trade_interactor,
+        messenger = messenger_api,
+        error_handler = error_handler,
+        mapper=signal_to_intent_mapper,
+    )
+
     signal_controller: SignalController = providers.Singleton(
         SignalController,
-        mapper = signal_to_intent_mapper,
         messenger = messenger_api,
-        interactor = trade_interactor,
-        error_handler = error_handler,
         logger = logger,
         trade_logger = trading_logger,
-        secured_config = secured_config
+        secured_config = secured_config,
+        request_queue = request_queue
     )

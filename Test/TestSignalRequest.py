@@ -27,6 +27,7 @@ def open_short():
     print("--------SHORT TEST--------")
     data = json.dumps({
         "signal": "open_short",
+        "timestamp": "1234561",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
@@ -38,6 +39,7 @@ def open_long():
     print("--------LONG TEST--------")
     data = json.dumps({
         "signal": "open_long",
+        "timestamp": "1234562",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
@@ -49,6 +51,7 @@ def set_stop_loss(stop_price: float, side: str):
     print("--------STOP LOSS TEST--------")
     data = json.dumps({
         "signal": "stop_loss",
+        "timestamp": "1234563",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "stop_price": str(stop_price),
@@ -62,6 +65,7 @@ def set_take_profit(stop_price: float, side: str, take_profit_percentage: int):
     print("--------TAKE_PROFIT_TEST--------")
     data = json.dumps({
         "signal": "take_profit",
+        "timestamp": "1234564",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "trigger_price": str(stop_price),
@@ -76,6 +80,7 @@ def set_take_profit_market(stop_price: float, side: str, take_profit_percentage:
     print("--------STOP LOSS TEST--------")
     data = json.dumps({
         "signal": "take_profit",
+        "timestamp": "1234565",
         "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
         "side": side,
         "trigger_price": str(stop_price),
