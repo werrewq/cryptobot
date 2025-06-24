@@ -32,10 +32,10 @@ def place_sell_order():
     print(res)
 
 def have_long_order():
-    print(api.have_order_long(trading_config))
+    print(api.have_long_position(trading_config))
 
 def have_short_order():
-    print(api.have_order_short(trading_config))
+    print(api.have_short_position(trading_config))
 
 def close_long_position():
     api.close_long_position(trading_config)

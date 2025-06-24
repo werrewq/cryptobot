@@ -1,3 +1,5 @@
+import logging
+
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.dto.TradeIntent import ShortIntent
@@ -17,6 +19,7 @@ class OpenShortUseCase:
         self.__bot_open_short(short_intent)
 
     def __bot_open_short(self, short_intent: ShortIntent):
+        logging.debug(f"SHORT UseCase")
         self.messenger_api.send_message(message="Пробуем открыть SHORT 📉")
         self.close_long_usecase.run(short_intent)
         message = self.broker_api.place_sell_order(short_intent)

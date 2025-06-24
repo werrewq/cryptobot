@@ -1,3 +1,5 @@
+import logging
+
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.dto.TradeIntent import TradeIntent
@@ -15,10 +17,12 @@ class CloseLongUseCase:
         self.__bot_close_long(trade_intent)
 
     def __bot_close_long(self, trade_intent: TradeIntent):
+        logging.debug(f"CLOSE LONG UseCase")
         self.broker_api.cancel_all_active_orders(trading_config=trade_intent.trading_config)
-        has_long = self.broker_api.have_order_long(trade_intent.trading_config)
+        has_long = self.broker_api.have_long_position(trade_intent.trading_config)
         self.messenger_api.send_message(f"#Проверяем наличие открытых лонгов: {str(has_long)}")
         if has_long:
+            logging.debug(f"Нашли открытый лонг, закрываем")
             self.messenger_api.send_message("#Закрываем Long")
             resp = self.broker_api.close_long_position(trade_intent.trading_config)
             self.messenger_api.send_message("#Закрыли Long ✅\n" + resp)

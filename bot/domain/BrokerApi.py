@@ -7,11 +7,11 @@ from bot.domain.dto.TradingConfig import TradingConfig
 class BrokerApi:
 
     @abc.abstractmethod
-    def have_order_long(self, trading_config: TradingConfig) -> bool:
+    def have_long_position(self, trading_config: TradingConfig) -> bool:
         pass
 
     @abc.abstractmethod
-    def have_order_short(self, trading_config: TradingConfig) -> bool:
+    def have_short_position(self, trading_config: TradingConfig) -> bool:
         pass
 
     @abc.abstractmethod

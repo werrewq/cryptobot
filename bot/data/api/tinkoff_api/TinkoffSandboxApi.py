@@ -66,6 +66,12 @@ class TinkoffSandboxApi(TinkoffApi):
                 except Exception as e:
                     logging.debug(f"Ошибка при отмене заявки {order.id}: {e}")
 
+    def have_active_orders(self) -> bool:
+        with Client(sandbox_token=self.__token, token=self.__token, target=self.__target) as client:
+            orders_response = client.orders.get_orders(account_id=self.__account_id)
+            orders = orders_response.orders
+            return len(orders) != 0
+
     def get_stop_orders(self, account_id: str) -> GetStopOrdersResponse:
         logging.debug("get_stop_orders not implemented in SANDBOX")
         raise Exception("get_stop_orders not implemented in SANDBOX")

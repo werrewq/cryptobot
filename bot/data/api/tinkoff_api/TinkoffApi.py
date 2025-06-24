@@ -48,6 +48,10 @@ class TinkoffApi:
     def get_max_market_lots(self, account_id: str, figi: str) -> GetMaxLotsResponse:
         pass
 
+    @abc.abstractmethod
+    def have_active_orders(self) -> bool:
+        pass
+
 
 
 

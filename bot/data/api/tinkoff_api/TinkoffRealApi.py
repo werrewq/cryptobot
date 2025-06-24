@@ -49,6 +49,12 @@ class TinkoffRealApi(TinkoffApi):
                 except Exception as e:
                     logging.debug(f"Ошибка при отмене заявки {order.order_id}: {e}")
 
+    def have_active_orders(self) -> bool:
+        with Client(token=self.__token, target=self.__target) as client:
+            orders_response = client.orders.get_orders(account_id=self.__account_id)
+            orders = orders_response.orders
+            return len(orders) != 0
+
     def get_stop_orders(self, account_id: str) -> GetStopOrdersResponse:
         with Client(token=self.__token, target=self.__target) as client:
             resp = client.stop_orders.get_stop_orders(account_id=account_id, status=StopOrderStatusOption.STOP_ORDER_STATUS_ACTIVE)

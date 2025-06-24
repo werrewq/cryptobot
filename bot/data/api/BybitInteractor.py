@@ -99,10 +99,10 @@ class BybitInteractor(BrokerApi):
                 return float(coin['walletBalance'])
         return 0.0
 
-    def have_order_long(self, trading_config: TradingConfig) -> bool:
+    def have_long_position(self, trading_config: TradingConfig) -> bool:
         return self.__have_order(trading_config, PositionType.LONG)
 
-    def have_order_short(self, trading_config: TradingConfig) -> bool:
+    def have_short_position(self, trading_config: TradingConfig) -> bool:
         return self.__have_order(trading_config, PositionType.SHORT)
 
     def __have_order(self, trading_config: TradingConfig, position_type: PositionType):

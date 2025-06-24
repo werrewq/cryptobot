@@ -34,10 +34,10 @@ class TinkoffInteractor(BrokerApi):
         self.__retry_request_fabric = retry_request_fabric
         self.__instrument_figi = self.get_figi(ticker=trading_config.target_share_name, instrument_type=INSTRUMENT_TYPE)
 
-    def have_order_long(self, trading_config: TradingConfig) -> bool:
+    def have_long_position(self, trading_config: TradingConfig) -> bool:
         return self.__has_position(direction=OrderDirection.ORDER_DIRECTION_BUY)
 
-    def have_order_short(self, trading_config: TradingConfig) -> bool:
+    def have_short_position(self, trading_config: TradingConfig) -> bool:
         return self.__has_position(direction=OrderDirection.ORDER_DIRECTION_SELL)
 
     def __has_position(self, direction: OrderDirection) -> bool:
@@ -121,9 +121,10 @@ class TinkoffInteractor(BrokerApi):
         if quantity_to_sell is None:
             raise Exception("Не найдено количество бумаг для закрытия шорта")
         quantity_to_sell = abs(quantity_to_sell)
+        logging.debug(f"CLOSE SHORT: quantity = {str(quantity_to_sell)}")
         # Отправляем рыночный ордер на продажу такого же количества в противоположную сторону
         res = self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_BUY, quantity=quantity_to_sell, figi=self.__instrument_figi)
-        while self.have_order_short(trading_config):
+        while self.have_short_position(trading_config) or self.__tinkoff_api.have_active_orders():
             logging.debug("close_short_position sleep")
             sleep(2)
         return res
@@ -142,9 +143,10 @@ class TinkoffInteractor(BrokerApi):
                 quantity_to_sell = position.balance
         if quantity_to_sell is None:
             raise Exception("Не найдено количество бумаг для закрытия лонга")
+        logging.debug(f"CLOSE LONG: quantity = {str(quantity_to_sell)}")
         # Отправляем рыночный ордер на продажу такого же количества в противоположную сторону
         res = self.__place_market_order(direction=OrderDirection.ORDER_DIRECTION_SELL, quantity=quantity_to_sell, figi=self.__instrument_figi)
-        while self.have_order_long(trading_config):
+        while self.have_long_position(trading_config) or self.__tinkoff_api.have_active_orders():
             logging.debug("close_long_position sleep")
             sleep(2)
         return res
@@ -170,9 +172,9 @@ class TinkoffInteractor(BrokerApi):
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
 
         direction = None
-        if self.have_order_long(stop_loss_intent.trading_config):
+        if self.have_long_position(stop_loss_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_SELL
-        elif self.have_order_short(stop_loss_intent.trading_config):
+        elif self.have_short_position(stop_loss_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_BUY
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")
@@ -194,9 +196,9 @@ class TinkoffInteractor(BrokerApi):
         for order in orders.stop_orders:
             self.__tinkoff_api.cancel_stop_order(self.__account_id, stop_order_id=order.stop_order_id)
         direction = None
-        if self.have_order_long(take_profit_intent.trading_config):
+        if self.have_long_position(take_profit_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_SELL
-        elif self.have_order_short(take_profit_intent.trading_config):
+        elif self.have_short_position(take_profit_intent.trading_config):
             direction = StopOrderDirection.STOP_ORDER_DIRECTION_BUY
         if direction is None:
             raise Exception("Не нашли наличия лонгов/шортов для определения направления стоп-лосса")

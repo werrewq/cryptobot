@@ -25,10 +25,10 @@ def place_sell_order():
     print(res)
 
 def have_long_order():
-    print(tinkoff_interactor.have_order_long(trading_config))
+    print(tinkoff_interactor.have_long_position(trading_config))
 
 def have_short_order():
-    print(tinkoff_interactor.have_order_short(trading_config))
+    print(tinkoff_interactor.have_short_position(trading_config))
 
 def close_long_position():
     tinkoff_interactor.close_long_position(trading_config)

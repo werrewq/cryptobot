@@ -1,3 +1,5 @@
+import logging
+
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.MessengerApi import MessengerApi
 from bot.domain.dto.TradeIntent import LongIntent
@@ -19,6 +21,7 @@ class OpenLongUseCase:
 
 
     def __bot_open_long(self, long_intent: LongIntent):
+        logging.debug(f"LONG UseCase")
         self.messenger_api.send_message(message="Пробуем открыть LONG 📈")
         self.close_short_usecase.run(long_intent)
         message = self.broker_api.place_buy_order(long_intent)
