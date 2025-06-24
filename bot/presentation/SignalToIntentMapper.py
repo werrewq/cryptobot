@@ -1,4 +1,5 @@
-from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent
+from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent, \
+    CloseAllIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
 # {"signal":"{{strategy.order.comment}}","token":"2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2","side":"{{strategy.order.action}}"}
@@ -26,5 +27,7 @@ class SignalToIntentMapper:
                     take_profit_percentage_from_order=take_profit_percentage,
                     market=market,
                     side=data["side"])
+            case "close_all":
+                return CloseAllIntent(trading_config=self.__trading_config, side="all")
             case _:
                 raise TypeError('Unsupported trade intent')

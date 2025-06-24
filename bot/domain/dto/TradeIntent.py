@@ -16,6 +16,10 @@ class ShortIntent(TradeIntent):
     pass
 
 @dataclass
+class CloseAllIntent(TradeIntent):
+    pass
+
+@dataclass
 class StopLossIntent(TradeIntent):
     trigger_price: float
 

@@ -12,12 +12,22 @@ url = 'https://werrewq-cryptobot-d513.twc1.net' # Taurus
 # jsonData = '{"signal": "open_long", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
 # alert(jsonData)
 
+# strategy.entry("SELL", strategy.short, comment="open_short")
+# jsonData = '{"signal": "open_short", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+
+# strategy.exit('Exit Long', 'Long', stop = stoplossLine)
 # price = str.tostring(2.1)
 # jsonData = '{"signal": "stop_loss", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2", "side":"' + side + '", "stop_price":"' + price + '"}'
 # alert(jsonData)
 
-# strategy.entry("SELL", strategy.short, comment="open_short")
-# jsonData = '{"signal": "open_short", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# тейк профит по маркету
+# strategy.close('Long', comment = "take profit", qty_percent = takeProfitPercent)
+# jsonData = '{"signal": "stop_loss", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2", "side":"' + side + '", "trigger_price":"' + price + '", "take_profit_percentage":"' + percentage + '", "market":"True"}'
+# alert(jsonData)
+
+# close all
+# jsonData = '{"signal": "close_all", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# alert(jsonData)
 
 # Заголовки запроса
 headers = {
@@ -87,6 +97,17 @@ def set_take_profit_market(stop_price: float, side: str, take_profit_percentage:
         "trigger_price": str(stop_price),
         "take_profit_percentage_from_order": str(take_profit_percentage),
         "market": True
+    })
+    response = requests.post(url + "/position", json=data, headers= headers)
+    print("Response: " + response.text)
+    print("Response status code:", response.status_code)
+    print("Response JSON:", str(response.json()))
+
+def close_all():
+    print("--------CLOSE ALL--------")
+    data = json.dumps({
+        "signal": "close_all",
+        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
     print("Response: " + response.text)

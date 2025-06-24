@@ -13,6 +13,7 @@ from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor
 from bot.domain.dto.TradingConfig import TradingConfig
+from bot.domain.usecase.CloseAllUseCase import CloseAllUseCase
 from bot.domain.usecase.CloseLongUseCase import CloseLongUseCase
 from bot.domain.usecase.CloseShortUseCase import CloseShortUseCase
 from bot.domain.usecase.OpenLongUseCase import OpenLongUseCase
@@ -133,12 +134,19 @@ class ApplicationContainer(containers.DeclarativeContainer):
         messenger_api = messenger_api
     )
 
+    close_all_usecase = providers.Factory(
+        CloseAllUseCase,
+        broker_api = broker_api,
+        messenger_api = messenger_api
+    )
+
     trade_interactor: TradeInteractor = providers.Factory(
         TradeInteractor,
         open_long_usecase = open_long_usecase,
         open_short_usecase = open_short_usecase,
         set_stop_loss_usecase = set_stop_loss_usecase,
         set_take_profit_usecase = set_take_profit_usecase,
+        close_all_usecase = close_all_usecase,
         messenger_api = messenger_api,
         trading_status_interactor = trading_status_interactor
     )
