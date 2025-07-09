@@ -66,9 +66,13 @@ class TelegramApi(MessengerApi):
         return markup
 
     def send_message(self, message: str):
+        if len(message) > 4000:
+            trimmed_message = message[:4000]
+        else:
+            trimmed_message = message
         chat_id = self.__message_presenter.get_authenticated_user_id()
         logging.debug(f"send_message to chat {str(chat_id)}")
         if chat_id is not None:
-            self.bot.send_message(chat_id = self.__message_presenter.get_authenticated_user_id(), text=message)
+            self.bot.send_message(chat_id = self.__message_presenter.get_authenticated_user_id(), text=trimmed_message)
         else:
             logging.debug(f"send_message chat not yet attached")
