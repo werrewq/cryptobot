@@ -19,7 +19,7 @@ tinkoff_interactor = TinkoffInteractor(tinkoff_api=tinkoff_api, secured_config=s
 def place_sell_order():
     intent = ShortIntent(
         trading_config= trading_config,
-        side="sell"
+        side="Sell"
     )
     res = tinkoff_interactor.place_sell_order(intent)
     print(res)
@@ -37,7 +37,7 @@ def close_short_position():
     tinkoff_interactor.close_short_position(trading_config)
 
 def place_buy_order():
-    intent = LongIntent(trading_config, side="buy")
+    intent = LongIntent(trading_config, side="Buy")
     res = tinkoff_interactor.place_buy_order(intent)
     print(res)
 

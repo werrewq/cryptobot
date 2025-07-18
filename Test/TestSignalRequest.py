@@ -117,6 +117,19 @@ def set_revert_limit(stop_price: float, side: str):
     print("Response status code:", response.status_code)
     print("Response JSON:", str(response.json()))
 
+def send_synchro(side: str):
+    print("--------STOP LOSS TEST--------")
+    data = json.dumps({
+        "signal": "synchro",
+        "timestamp": "1234566",
+        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "side": side,
+    })
+    response = requests.post(url + "/position", json=data, headers= headers)
+    print("Response: " + response.text)
+    print("Response status code:", response.status_code)
+    print("Response JSON:", str(response.json()))
+
 def close_all():
     print("--------CLOSE ALL--------")
     data = json.dumps({

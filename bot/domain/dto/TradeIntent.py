@@ -32,3 +32,7 @@ class TakeProfitIntent(TradeIntent):
 @dataclass
 class RevertLimitIntent(TradeIntent):
     trigger_price: float
+
+@dataclass
+class SynchroIntent(TradeIntent):
+    pass

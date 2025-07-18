@@ -21,6 +21,7 @@ from bot.domain.usecase.OpenShortUseCase import OpenShortUseCase
 from bot.domain.usecase.SetStopLossUseCase import SetStopLossUseCase
 from bot.domain.usecase.SetTakeProfitUseCase import SetTakeProfitUseCase
 from bot.domain.usecase.SetRevertLimitUseCase import SetRevertLimitUseCase
+from bot.domain.usecase.SynchroUseCase import SynchroUseCase
 from bot.presentation.SignalController import SignalController
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.logger.BotLogger import BotLogger
@@ -153,6 +154,14 @@ class ApplicationContainer(containers.DeclarativeContainer):
         messenger_api = messenger_api
     )
 
+    synchro_usecase = providers.Factory(
+        SynchroUseCase,
+        broker_api = broker_api,
+        messenger_api = messenger_api,
+        open_long_usecase=open_long_usecase,
+        open_short_usecase=open_short_usecase,
+    )
+
     trade_interactor: TradeInteractor = providers.Factory(
         TradeInteractor,
         open_long_usecase = open_long_usecase,
@@ -161,6 +170,7 @@ class ApplicationContainer(containers.DeclarativeContainer):
         set_take_profit_usecase = set_take_profit_usecase,
         set_revert_limit_usecase = set_revert_limit_usecase,
         close_all_usecase = close_all_usecase,
+        synchro_usecase = synchro_usecase,
         messenger_api = messenger_api,
         trading_status_interactor = trading_status_interactor
     )
