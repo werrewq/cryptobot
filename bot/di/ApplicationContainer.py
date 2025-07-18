@@ -194,7 +194,6 @@ class ApplicationContainer(containers.DeclarativeContainer):
         request_queue = request_queue,
         event_loop = event_loop,
         interactor = trade_interactor,
-        messenger = messenger_api,
         error_handler = error_handler,
         mapper=signal_to_intent_mapper,
     )

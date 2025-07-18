@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 event_loop = EventLoop()
 queue = RequestTimePriorityQueue(event_loop)
-request_loop = RequestEventLoop(queue, event_loop, Mock(), Mock(), Mock(), Mock())
+request_loop = RequestEventLoop(queue, event_loop, Mock(), Mock(), Mock())
 
 
 request1 = {

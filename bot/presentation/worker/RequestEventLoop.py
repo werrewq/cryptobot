@@ -1,7 +1,6 @@
 from typing import Any
 
 from bot.domain.ErrorHandler import ErrorHandler
-from bot.domain.MessengerApi import MessengerApi
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.presentation.SignalToIntentMapper import SignalToIntentMapper
 from bot.presentation.worker.EventLoop import EventLoop
@@ -16,14 +15,12 @@ class RequestEventLoop:
     __interactor: TradeInteractor
     __error_handler: ErrorHandler
     __mapper: SignalToIntentMapper
-    __messenger: MessengerApi
 
     def __init__(
             self,
             request_queue: RequestTimePriorityQueue,
             event_loop: EventLoop,
             interactor: TradeInteractor,
-            messenger: MessengerApi,
             error_handler: ErrorHandler,
             mapper: SignalToIntentMapper
     ):
@@ -32,7 +29,6 @@ class RequestEventLoop:
         self.thread = threading.Thread(target=self.__start_event_loop, daemon=True)
         self.__interactor = interactor
         self.__error_handler = error_handler
-        self.__messenger = messenger
         self.__mapper = mapper
 
     def start(self):
@@ -68,8 +64,6 @@ class RequestEventLoop:
         time = data["timestamp"]
         # Тут логика обработки запроса
         logging.debug(f"Обработка запроса: time:{time}\n{str(data)}")
-
-        self.__messenger.send_message("Signal from TRADING VIEW \n" + str(data["signal"]))
         self.__error_handler.handle(lambda: self.process_signal(data))
 
     def process_signal(self, json_data):
