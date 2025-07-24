@@ -64,9 +64,14 @@ class TinkoffInteractor(BrokerApi):
     def __place_sell_order(self, short_intent: ShortIntent) -> str:
         direction: OrderDirection = OrderDirection.ORDER_DIRECTION_SELL
         figi = self.__instrument_figi
-        max_market_lots = self.get_max_market_lots()
-        quantity = max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
-        logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots)}")
+        if self.have_long_position(short_intent.trading_config):
+            long_quantity = self.get_target_asset_qty_on_account()
+            quantity = long_quantity * 2
+            logging.debug(f"place_sell_order: quantity = {str(quantity)} get_target_asset_qty_on_account = {str(long_quantity)}")
+        else:
+            max_market_lots = self.get_max_market_lots()
+            quantity = max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+            logging.debug(f"place_sell_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction=direction, quantity=int(quantity), figi=figi)
 
     def place_buy_order(self, long_intent: LongIntent) -> str:
@@ -78,6 +83,8 @@ class TinkoffInteractor(BrokerApi):
         figi = self.__instrument_figi
         max_market_lots = self.get_max_market_lots()
         quantity = max_market_lots * self.__trading_config.order_volume_percent_of_capital / 100
+        # if self.have_short_position(long_intent.trading_config):
+        #     quantity = quantity * 2
         logging.debug(f"place_buy_order: quantity = {str(quantity)} buy_max_market_lots = {str(max_market_lots)}")
         return self.__place_market_order(direction= direction, quantity=int(quantity), figi=figi)
 

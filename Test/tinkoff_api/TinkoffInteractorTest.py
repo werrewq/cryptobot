@@ -1,20 +1,25 @@
 from bot.config.Decrypter import Decrypter
 from bot.config.SecuredConfig import SecuredConfig
 from bot.config.TradingConfigProvider import TradingConfigProvider
+from bot.data.api.RetryRequestHandler import RetryRequestHandlerFabric
 from bot.data.api.tinkoff_api.TinkoffInteractor import TinkoffInteractor
-from bot.data.api.tinkoff_api.TinkoffSandboxApi import TinkoffSandboxApi
+from bot.data.api.tinkoff_api.TinkoffRealApi import TinkoffRealApi
+from bot.domain.MessengerApi import MessengerApi
 from bot.domain.dto.TradeIntent import ShortIntent, LongIntent, StopLossIntent, TakeProfitIntent, RevertLimitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 from bot.presentation.logger.BotLogger import BotLogger
+from unittest.mock import Mock
 
 loger = BotLogger()
 loger.run()
 trading_config: TradingConfig = TradingConfigProvider().provide(test=True)
 decrypter = Decrypter(b'O\xa0\xd3\xe5[m\x8fRWY#\r\x96\xd4\xe7\x9d\x9b\xbe;D\xd4\x00wNA\xe3\xb1o\x8fM\x1c)')
 secured_config=SecuredConfig(trading_config=trading_config,decrypter=decrypter)
-# tinkoff_api = TinkoffRealApi(secured_config=secured_config)
-tinkoff_api = TinkoffSandboxApi(secured_config=secured_config)
-tinkoff_interactor = TinkoffInteractor(tinkoff_api=tinkoff_api, secured_config=secured_config, trading_config=trading_config)
+tinkoff_api = TinkoffRealApi(secured_config=secured_config)
+# tinkoff_api = TinkoffSandboxApi(secured_config=secured_config)
+messenger: MessengerApi = Mock()
+retry_request_fabric = RetryRequestHandlerFabric(messenger)
+tinkoff_interactor = TinkoffInteractor(tinkoff_api=tinkoff_api, secured_config=secured_config, trading_config=trading_config, retry_request_fabric=retry_request_fabric)
 
 def place_sell_order():
     intent = ShortIntent(

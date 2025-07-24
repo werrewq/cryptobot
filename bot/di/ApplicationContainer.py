@@ -104,30 +104,28 @@ class ApplicationContainer(containers.DeclarativeContainer):
         retry_request_fabric = retry_request_handler_fabric,
     )
 
-    close_short_usecase = providers.Factory(
-        CloseShortUseCase,
-        broker_api=broker_api,
-        messenger_api=messenger_api,
-    )
-
-    close_long_usecase = providers.Factory(
-        CloseLongUseCase,
-        broker_api=broker_api,
-        messenger_api=messenger_api,
-    )
+    # close_short_usecase = providers.Factory(
+    #     CloseShortUseCase,
+    #     broker_api=broker_api,
+    #     messenger_api=messenger_api,
+    # )
+    #
+    # close_long_usecase = providers.Factory(
+    #     CloseLongUseCase,
+    #     broker_api=broker_api,
+    #     messenger_api=messenger_api,
+    # )
 
     open_long_usecase = providers.Factory(
         OpenLongUseCase,
         broker_api=broker_api,
         messenger_api=messenger_api,
-        close_short_usecase=close_short_usecase
     )
 
     open_short_usecase = providers.Factory(
         OpenShortUseCase,
         broker_api = broker_api,
         messenger_api = messenger_api,
-        close_long_usecase = close_long_usecase
     )
 
     set_stop_loss_usecase = providers.Factory(
