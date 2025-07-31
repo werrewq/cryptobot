@@ -87,6 +87,8 @@ class TradeInteractor:
                 raise TypeError('Unsupported type')
 
     def close_by_timer(self):
-        self.__messenger.send_message("#⚠️Нету синхро сигнала. Закрываем позиции⚠️")
-        trade_intent = CloseAllIntent(self.__trading_config, side="all")
-        self.__close_all_usecase.run(trade_intent)
+        trading_status = self.__trading_status_interactor.get_trading_status()
+        if trading_status != TradingStatus.OFFLINE:
+            self.__messenger.send_message("#⚠️Нет синхро сигнала. Закрываем позиции⚠️")
+            trade_intent = CloseAllIntent(self.__trading_config, side="all")
+            self.__close_all_usecase.run(trade_intent)

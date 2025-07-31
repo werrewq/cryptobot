@@ -46,7 +46,7 @@ class SaveTimer:
                 return
             self._callback = callback_fun
             self._running = True
-            self._timer = threading.Timer(0, self._run)
+            self._timer = threading.Timer(120, self._run)
             self._timer.start()
 
     def reset_timer(self):

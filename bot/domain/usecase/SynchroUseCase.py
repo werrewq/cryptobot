@@ -30,11 +30,14 @@ class SynchroUseCase:
 
     def __bot_synchronize(self, synchro_intent: SynchroIntent):
         logging.debug(f"SynchroUseCase: {synchro_intent}")
-        if self.__broker_api.have_long_position(synchro_intent.trading_config) and synchro_intent.side == "Sell":
+        have_long = self.__broker_api.have_long_position(synchro_intent.trading_config)
+        have_short = self.__broker_api.have_short_position(synchro_intent.trading_config)
+        if not have_short and synchro_intent.side == "Sell":
             self.__messenger_api.send_message("#⚠️Расхождение с синхронизирующим сигналом: переходим в Short⚠️")
             self.__open_short_usecase.run(ShortIntent(trading_config= synchro_intent.trading_config, side=synchro_intent.side))
 
-        elif self.__broker_api.have_short_position(synchro_intent.trading_config) and synchro_intent.side == "Buy":
+        elif not have_long and synchro_intent.side == "Buy":
             self.__messenger_api.send_message("#⚠️Расхождение с синхронизирующим сигналом: переходим в Long⚠️")
             self.__open_long_usecase.run(LongIntent(trading_config= synchro_intent.trading_config, side=synchro_intent.side))
+
 
