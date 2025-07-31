@@ -1,7 +1,9 @@
 import logging
 
 from bot.domain.MessengerApi import MessengerApi
+from bot.domain.SaveTimer import SaveTimer
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor, TradingStatus
+from bot.domain.dto import TradingConfig
 from bot.domain.dto.TradeIntent import LongIntent, ShortIntent, TradeIntent, StopLossIntent, TakeProfitIntent, \
     CloseAllIntent, RevertLimitIntent, SynchroIntent
 from bot.domain.usecase import OpenLongUseCase, OpenShortUseCase, SetStopLossUseCase, SetTakeProfitUseCase, CloseAllUseCase, SetRevertLimitUseCase, SynchroUseCase
@@ -16,6 +18,8 @@ class TradeInteractor:
     __set_take_profit_usecase: SetTakeProfitUseCase
     __set_revert_limit_usecase: SetRevertLimitUseCase
     __synchro_usecase: SynchroUseCase
+    __save_timer: SaveTimer
+    __trading_config: TradingConfig
 
     def __init__(
             self,
@@ -28,6 +32,8 @@ class TradeInteractor:
             synchro_usecase: SynchroUseCase,
             messenger_api: MessengerApi,
             trading_status_interactor: TradingStatusInteractor,
+            save_timer: SaveTimer,
+            trading_config: TradingConfig,
     ):
         self.__open_long_usecase = open_long_usecase
         self.__open_short_usecase = open_short_usecase
@@ -38,8 +44,14 @@ class TradeInteractor:
         self.__set_revert_limit_usecase = set_revert_limit_usecase
         self.__close_all_usecase = close_all_usecase
         self.__synchro_usecase = synchro_usecase
+        self.__save_timer = save_timer
+        self.__trading_config = trading_config
+        self.__save_timer.start(self.close_by_timer)
+
 
     def start_trade(self, trade_intent: TradeIntent):
+        # Пришел сигнал, сервисы работают, сбрасываем таймер закрытия позиции
+        self.__save_timer.reset_timer()
         if not isinstance(trade_intent, SynchroIntent):
             self.__messenger.send_message("Пришла заявка на торговлю: " + trade_intent.trading_config.target_share_name)
         trading_status = self.__trading_status_interactor.get_trading_status()
@@ -74,3 +86,7 @@ class TradeInteractor:
             case _:
                 raise TypeError('Unsupported type')
 
+    def close_by_timer(self):
+        self.__messenger.send_message("#⚠️Нету синхро сигнала. Закрываем позиции⚠️")
+        trade_intent = CloseAllIntent(self.__trading_config, side="all")
+        self.__close_all_usecase.run(trade_intent)

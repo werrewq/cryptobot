@@ -4,5 +4,8 @@
   "asset_name": "rub",
   "leverage": 1,
   "test_env_vars": false,
-  "sandbox": true
+  "sandbox": true,
+  "timezone": "Etc/GMT-3",
+  "work_start_time": "07:00",
+  "work_end_time": "21:30"
 }

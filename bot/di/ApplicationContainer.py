@@ -10,6 +10,7 @@ from bot.data.api.tinkoff_api.TinkoffInteractor import TinkoffInteractor
 from bot.domain.BrokerApi import BrokerApi
 from bot.domain.ErrorHandler import ErrorHandler
 from bot.domain.MessengerApi import MessengerApi
+from bot.domain.SaveTimer import SaveTimer
 from bot.domain.TradeInteractor import TradeInteractor
 from bot.domain.TradingStatusInteractor import TradingStatusInteractor
 from bot.domain.dto.TradingConfig import TradingConfig
@@ -160,6 +161,11 @@ class ApplicationContainer(containers.DeclarativeContainer):
         open_short_usecase=open_short_usecase,
     )
 
+    save_timer: SaveTimer = providers.Singleton(
+        SaveTimer,
+        trading_config = trading_config
+    )
+
     trade_interactor: TradeInteractor = providers.Factory(
         TradeInteractor,
         open_long_usecase = open_long_usecase,
@@ -170,7 +176,9 @@ class ApplicationContainer(containers.DeclarativeContainer):
         close_all_usecase = close_all_usecase,
         synchro_usecase = synchro_usecase,
         messenger_api = messenger_api,
-        trading_status_interactor = trading_status_interactor
+        trading_status_interactor = trading_status_interactor,
+        save_timer = save_timer,
+        trading_config = trading_config,
     )
 
     error_handler: ErrorHandler = providers.Singleton(

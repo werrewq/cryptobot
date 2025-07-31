@@ -8,4 +8,7 @@ class TradingConfig:
     leverage: int
     sandbox: bool
     test_env_vars: bool
+    timezone: str
+    work_start_time: str  # в формате "HH:MM"
+    work_end_time: str    # в формате "HH:MM"
 

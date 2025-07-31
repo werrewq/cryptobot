@@ -26,4 +26,7 @@ class TradingConfigProvider:
                 leverage = trading_config_json['leverage'],
                 test_env_vars = test_env_vars,
                 sandbox= trading_config_json['sandbox'],
+                timezone=trading_config_json.get('timezone', 'Etc/GMT-3'),
+                work_start_time=trading_config_json.get('work_start_time', '07:00'),
+                work_end_time=trading_config_json.get('work_end_time', '21:30')
             )
