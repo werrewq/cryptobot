@@ -191,7 +191,7 @@ class TinkoffInteractor(BrokerApi):
 
         stop_price = float_to_quotation(stop_loss_intent.trigger_price)
 
-        self.__tinkoff_api.post_stop_loss_order( # TODO нужно возвращать какой-то пруф от api
+        self.__tinkoff_api.post_market_stop_loss_order( # TODO нужно возвращать какой-то пруф от api
             figi=self.__instrument_figi,
             quantity=self.get_target_asset_qty_on_account(),
             direction=direction,
@@ -289,7 +289,7 @@ class TinkoffInteractor(BrokerApi):
         stop_price = float_to_quotation(revert_limit_intent.trigger_price)
         revert_qty = int(self.get_target_asset_qty_on_account() * 2)
 
-        self.__tinkoff_api.post_stop_loss_order(
+        self.__tinkoff_api.post_market_stop_loss_order(
             figi=self.__instrument_figi,
             quantity=revert_qty,
             direction=direction,

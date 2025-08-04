@@ -81,7 +81,7 @@ class TinkoffSandboxApi(TinkoffApi):
         logging.debug("cancel_stop_order not implemented in SANDBOX")
         raise Exception("cancel_stop_order not implemented in SANDBOX")
 
-    def post_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
+    def post_market_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
         logging.debug("post_stop_loss_order not implemented in SANDBOX")
         raise Exception("post_stop_loss_order not implemented in SANDBOX")
 

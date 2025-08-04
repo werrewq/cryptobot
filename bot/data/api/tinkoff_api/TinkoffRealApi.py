@@ -67,7 +67,7 @@ class TinkoffRealApi(TinkoffApi):
                 stop_order_id=stop_order_id
             )
 
-    def post_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
+    def post_market_stop_loss_order(self, figi: str, quantity: int, direction: StopOrderDirection, account_id: str, stop_price: Quotation):
         with Client(token=self.__token, target=self.__target) as client:
             client.stop_orders.post_stop_order(
                 account_id=account_id,
@@ -77,6 +77,7 @@ class TinkoffRealApi(TinkoffApi):
                 stop_price=stop_price,
                 expiration_type=StopOrderExpirationType.STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL,
                 stop_order_type=StopOrderType.STOP_ORDER_TYPE_STOP_LOSS,
+                exchange_order_type=ExchangeOrderType.EXCHANGE_ORDER_TYPE_MARKET,
                 price_type=PriceType.PRICE_TYPE_CURRENCY,
             )
 
