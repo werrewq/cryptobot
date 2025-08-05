@@ -19,6 +19,8 @@ class OpenLongUseCase:
 
     def __bot_open_long(self, long_intent: LongIntent):
         logging.debug(f"LONG UseCase")
+        self.messenger_api.send_message(message="Пробуем закрыть все старые стоп ордера")
+        self.broker_api.cancel_all_active_orders(long_intent.trading_config)
         self.messenger_api.send_message(message="Пробуем открыть LONG 📈")
         message = self.broker_api.place_buy_order(long_intent)
         self.messenger_api.send_message(message="Разместили заказ на покупку\n" + message)

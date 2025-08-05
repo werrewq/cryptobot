@@ -17,6 +17,8 @@ class OpenShortUseCase:
 
     def __bot_open_short(self, short_intent: ShortIntent):
         logging.debug(f"SHORT UseCase")
+        self.messenger_api.send_message(message="Пробуем закрыть все старые стоп ордера")
+        self.broker_api.cancel_all_active_orders(short_intent.trading_config)
         self.messenger_api.send_message(message="Пробуем открыть SHORT 📉")
         message = self.broker_api.place_sell_order(short_intent)
         self.messenger_api.send_message(message="Разместили заказ на продажу\n: " + message)
