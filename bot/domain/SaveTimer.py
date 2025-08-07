@@ -31,18 +31,21 @@ class SaveTimer:
         return self._start_time <= current_time <= self._end_time and not (self._block_window_start_time <= current_time <= self._block_window_end_time)
 
     def _run(self):
+        logging.debug(f"SAVE TIMER: _run ")
         with self._lock:
             if not self._running:
                 return
-        if self._is_work_time():
-            try:
-                self._callback()
-            except Exception as e:
-                logging.debug(f"Ошибка в callback: {e}")
-        with self._lock:
-            if self._running:
-                self._timer = threading.Timer(120, self._run)
-                self._timer.start()
+            if self._timer:
+                self._timer.cancel()
+            if self._is_work_time():
+                try:
+                    logging.debug(f"SAVE TIMER: _callback() ")
+                    self._callback()
+                except Exception as e:
+                    logging.debug(f"Ошибка в callback: {e}")
+            self._timer = threading.Timer(120, self._run)
+            self._timer.start()
+            logging.debug(f"SAVE TIMER: threading.Timer(120, self._run) ")
 
     def start(self, callback_fun):
         with self._lock:
@@ -54,12 +57,16 @@ class SaveTimer:
             self._timer.start()
 
     def reset_timer(self):
+        logging.debug(f"SAVE TIMER: reset timer")
         if not self._is_work_time():
+            logging.debug(f"SAVE TIMER: not work time")
             return
         with self._lock:
             if self._timer:
                 self._timer.cancel()
             if self._running:
+                logging.debug(f"SAVE TIMER: _timer " + str(self._timer))
+                logging.debug(f"SAVE TIMER: _running " + str(self._running))
                 self._timer = threading.Timer(120, self._run)
                 self._timer.start()
 
