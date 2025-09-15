@@ -22,7 +22,7 @@
 - Авторизация для бота на стороне Telegram
 - Шифрование чувствительных данных
 
-![Cryptobot ui](Images/cryptobot_ui.png)
+<img width="400" src="Images/cryptobot_ui.png" alt="Cryptobot ui">
 
 ## 🛠 Технологии
 
