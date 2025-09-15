@@ -14,24 +14,24 @@ request_loop = RequestEventLoop(queue, event_loop, Mock(), Mock(), Mock(), Mock(
 request1 = {
     "signal": "open_long",
     "timestamp": "1234561",
-    "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+    "token": "your_bot_token"
 }
 
 request2 = {
     "signal": "open_short",
     "timestamp": "1234562",
-    "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+    "token": "your_bot_token"
 }
 
 request3 = {
     "signal": "open_long",
     "timestamp": "1234563",
-    "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+    "token": "your_bot_token"
 }
 
 data = json.dumps({
     "signal": "open_long",
-    "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+    "token": "your_bot_token"
 })
 
 if __name__ == '__main__':

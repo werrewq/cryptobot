@@ -1,7 +1,7 @@
 from bot.domain.dto.TradeIntent import TradeIntent, LongIntent, ShortIntent, StopLossIntent, TakeProfitIntent
 from bot.domain.dto.TradingConfig import TradingConfig
 
-# {"signal":"{{strategy.order.comment}}","token":"2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2","side":"{{strategy.order.action}}"}
+# {"signal":"{{strategy.order.comment}}","token":"your_bot_token","side":"{{strategy.order.action}}"}
 class SignalToIntentMapper:
     __trading_config: TradingConfig
 
