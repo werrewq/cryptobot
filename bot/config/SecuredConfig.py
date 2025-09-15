@@ -6,28 +6,11 @@ from bot.domain.dto.TradingConfig import TradingConfig
 
 test_chat_pass = "qwerty"
 
-# test_broker_api_key = "6pAf7l2HZn46GqJqu6"
-# test_broker_secret_key = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
-test_telegram_bot_api_token = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk"
-test_cryptobot_api_token = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
-
-# Demo trading test
-test_broker_api_key = "2muBHMXMcmq69KfJ9u"
-test_broker_secret_key = "aaZXtt0koKgJhqWzD7Pkgl1Rb6VqptZh2aRr"
-
-# Тестовые ключи
-# test_broker_api_key = "6pAf7l2HZn46GqJqu6"
-# test_broker_secret_key = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
-
-# only server
-# test_broker_api_key ZcNKoTlZYkouIPeXGE
-# test_broker_secret_key 3EEwQjfzXwyOh72bHjQEB7prHQEBODIk044E
-
 # ENCRYPTED TEST DATA:
-test_broker_api_key="XOw+/iFqNt9uIg2Xb4aHWhGJgaVBQZNdbsjDE1osaGHn3Q=="
-test_broker_secret_key="z41bJjQ/fdSRRSN9dDjEqP/X8h8UVwW26n4OYWtN0h3E/rOQ+j0jAo/AvfhdDCg2vcj8iQ=="
-test_telegram_bot_api_token="nkehNJmDNtREwe9bD7fCMED0UrLitJc8kMrcHtxUYmJ7Ky7vMSLwY68t3P4Js991xG67qXPskQvi51MjGA0="
-test_cryptobot_api_token="ZneAYlbPyFn7YSHGNbMhbTi2doRmuMjwptnsMfudU1ekO1u2LwnwBP0acyGR/6moUaR6dXFS3mRMbXsoN1/DeXE3G5Ygat9lSWb7O3KkgSk="
+test_broker_api_key="your_encrypted_test_broker_api_key"
+test_broker_secret_key="your_encrypted_test_broker_secret_key"
+test_telegram_bot_api_token="your_encrypted_test_telegram_bot_api_token"
+test_cryptobot_api_token="your_encrypted_test_cryptobot_api_token"
 
 class EnvironmentVariables:
 
