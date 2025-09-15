@@ -6,23 +6,6 @@ from bot.domain.dto.TradingConfig import TradingConfig
 
 test_chat_pass = "qwerty"
 
-# test_broker_api_key = "6pAf7l2HZn46GqJqu6"
-# test_broker_secret_key = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
-test_telegram_bot_api_token = "7848584263:AAH2EY10kySewTnclRLiQf6T9LPoae_yJnk"
-test_cryptobot_api_token = "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
-
-# Sandbox trading test
-test_broker_api_key = ""
-test_broker_secret_key = ""
-
-# Тестовые ключи
-# test_broker_api_key = "6pAf7l2HZn46GqJqu6"
-# test_broker_secret_key = "FHfaEudS6euKkiVobB6cDTkDzXs6TIBhX9Iu"
-
-# only server
-# test_broker_api_key ZcNKoTlZYkouIPeXGE
-# test_broker_secret_key 3EEwQjfzXwyOh72bHjQEB7prHQEBODIk044E
-
 # ENCRYPTED TEST DATA:
 test_broker_api_key=""
 broker_account_id=""

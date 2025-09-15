@@ -2,31 +2,26 @@ import json
 
 import requests
 
-#url = 'http://localhost:8000'
-#url = 'https://77.232.135.88/position'
-#url = 'https://werrewq-cryptobot-719a.twc1.net'
-#url = 'https://werrewq-cryptobot-6169.twc1.net' # Quail
-#url = 'https://werrewq-cryptobot-cba7.twc1.net' # Bittern
-url = 'https://werrewq-cryptobot-3af0.twc1.net' # Taurus
+url = 'your url'
 
-# jsonData = '{"signal": "open_long", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# jsonData = '{"signal": "open_long", "token": "your_bot_token"}'
 # alert(jsonData)
 
 # strategy.entry("SELL", strategy.short, comment="open_short")
-# jsonData = '{"signal": "open_short", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# jsonData = '{"signal": "open_short", "token": "your_bot_token"}'
 
 # strategy.exit('Exit Long', 'Long', stop = stoplossLine)
 # price = str.tostring(2.1)
-# jsonData = '{"signal": "stop_loss", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2", "side":"' + side + '", "stop_price":"' + price + '"}'
+# jsonData = '{"signal": "stop_loss", "token": "your_bot_token", "side":"' + side + '", "stop_price":"' + price + '"}'
 # alert(jsonData)
 
 # тейк профит по маркету
 # strategy.close('Long', comment = "take profit", qty_percent = takeProfitPercent)
-# jsonData = '{"signal": "stop_loss", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2", "side":"' + side + '", "trigger_price":"' + price + '", "take_profit_percentage":"' + percentage + '", "market":"True"}'
+# jsonData = '{"signal": "stop_loss", "token": "your_bot_token", "side":"' + side + '", "trigger_price":"' + price + '", "take_profit_percentage":"' + percentage + '", "market":"True"}'
 # alert(jsonData)
 
 # close all
-# jsonData = '{"signal": "close_all", "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"}'
+# jsonData = '{"signal": "close_all", "token": "your_bot_token"}'
 # alert(jsonData)
 
 # Заголовки запроса
@@ -39,7 +34,7 @@ def open_short():
     data = json.dumps({
         "signal": "open_short",
         "timestamp": "1234561",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+        "token": "your_bot_token"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
     print("Response: " + response.text)
@@ -51,7 +46,7 @@ def open_long():
     data = json.dumps({
         "signal": "open_long",
         "timestamp": "1234562",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+        "token": "your_bot_token"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
     print("Response: " + response.text)
@@ -63,7 +58,7 @@ def set_stop_loss(stop_price: float, side: str):
     data = json.dumps({
         "signal": "stop_loss",
         "timestamp": "1234563",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
         "side": side,
         "stop_price": str(stop_price),
     })
@@ -77,7 +72,7 @@ def set_take_profit(stop_price: float, side: str, take_profit_percentage: int):
     data = json.dumps({
         "signal": "take_profit",
         "timestamp": "1234564",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
         "side": side,
         "trigger_price": str(stop_price),
         "take_profit_percentage_from_order": str(take_profit_percentage),
@@ -92,7 +87,7 @@ def set_take_profit_market(stop_price: float, side: str, take_profit_percentage:
     data = json.dumps({
         "signal": "take_profit",
         "timestamp": "1234565",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
         "side": side,
         "trigger_price": str(stop_price),
         "take_profit_percentage_from_order": str(take_profit_percentage),
@@ -108,7 +103,7 @@ def set_revert_limit(stop_price: float, side: str):
     data = json.dumps({
         "signal": "revert_limit",
         "timestamp": "1234566",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
         "side": side,
         "stop_price": str(stop_price),
     })
@@ -122,7 +117,7 @@ def send_synchro(side: str):
     data = json.dumps({
         "signal": "synchro",
         "timestamp": "1234566",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
         "side": side,
     })
     response = requests.post(url + "/position", json=data, headers= headers)
@@ -135,7 +130,7 @@ def close_all():
     data = json.dumps({
         "signal": "close_all",
         "timestamp": "1234567",
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2"
+        "token": "your_bot_token"
     })
     response = requests.post(url + "/position", json=data, headers= headers)
     print("Response: " + response.text)
@@ -145,7 +140,7 @@ def close_all():
 def download_logs():
     print("--------DOWNLOAD_LOGS--------")
     data = json.dumps({
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
     })
     # download_headers = {
     #     "Content-Type": "text/plain",
@@ -162,7 +157,7 @@ def download_logs():
 def download_trade_logs():
     print("--------DOWNLOAD_TRADE_LOGS--------")
     data = json.dumps({
-        "token": "2hiKjBiVGL5LkkBKObXmQA6h4GoedZ5CYyQ7F8bOO12GES9pdTsisADIdcXUjTF2",
+        "token": "your_bot_token",
     })
     response = requests.post(url + "/trading_logs", json=data, headers= headers)
     if response.status_code == 200:
